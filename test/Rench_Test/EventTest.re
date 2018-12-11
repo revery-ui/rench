@@ -1,41 +1,40 @@
-
 open TestFramework;
 
 module Event = Rench.Event;
 
 describe("Event", ({test, _}) => {
   test("dispatch", ({expect}) => {
-      let evt: Event.t(int) = Event.create();
+    let evt: Event.t(int) = Event.create();
 
-      let c = ref(0);
-      let f = (v) => {
-          c := v;
-      };
+    let c = ref(0);
+    let f = v => {
+      c := v;
+    };
 
-      let _ = Event.subscribe(evt, f);
-      Event.dispatch(evt, 1)
+    let _ = Event.subscribe(evt, f);
+    Event.dispatch(evt, 1);
 
-      expect.int(c^).toBe(1);
+    expect.int(c^).toBe(1);
 
-      Event.dispatch(evt, 2)
+    Event.dispatch(evt, 2);
 
-      expect.int(c^).toBe(2);
+    expect.int(c^).toBe(2);
   });
 
   test("unsubscribe", ({expect}) => {
-      let evt: Event.t(int) = Event.create();
+    let evt: Event.t(int) = Event.create();
 
-      let c = ref(0);
-      let f = (v) => {
-          c := v;
-      };
+    let c = ref(0);
+    let f = v => {
+      c := v;
+    };
 
-      let unsubscribe = Event.subscribe(evt, f);
-      Event.dispatch(evt, 1)
-      unsubscribe();
+    let unsubscribe = Event.subscribe(evt, f);
+    Event.dispatch(evt, 1);
+    unsubscribe();
 
-      Event.dispatch(evt, 2)
+    Event.dispatch(evt, 2);
 
-      expect.int(c^).toBe(1);
+    expect.int(c^).toBe(1);
   });
 });
