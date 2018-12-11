@@ -9,12 +9,28 @@ type process = {
   stdout: outputPipe,
   stdin: inputPipe,
   onClose: Event.t(int),
-  mutable exitCode: option(int),
+  exitCode: ref(option(int)),
+};
+
+type processSync = {
+  pid: int,
+  exitCode: int,
+  stdout: string,
 };
 
 type t = process;
 
-let spawn = (cmd: string, args: array(string)) => {
+type innerProcess = {
+  pid: int,
+  stdout: outputPipe,
+  stdin: inputPipe,
+  onClose: Event.t(int),
+  exitCode: ref(option(int)),
+  _readThread: Thread.t,
+  _waitThread: Thread.t,
+};
+
+let _spawn = (cmd: string, args: array(string)) => {
   let (pstdin, stdin) = Unix.pipe();
   let (stdout, pstdout) = Unix.pipe();
 
@@ -40,7 +56,7 @@ let spawn = (cmd: string, args: array(string)) => {
 
   let isRunning = ref(true);
 
-  let _ =
+  let readThread =
     Thread.create(
       ((stdout, stdout_onData)) => {
         let buffer = Buffer.create(8192);
@@ -70,7 +86,7 @@ let spawn = (cmd: string, args: array(string)) => {
     Event.dispatch(onClose, exitCode);
   };
 
-  let _ =
+  let waitThread =
     Thread.create(
       pid => {
         open Unix;
@@ -95,15 +111,47 @@ let spawn = (cmd: string, args: array(string)) => {
 
   let retStdin: inputPipe = {write: stdinWrite};
 
-  let ret: process = {
+  let ret: innerProcess = {
     pid,
     stdin: retStdin,
     stdout: retStdout,
     onClose,
-    exitCode: None,
+    exitCode: ref(None),
+    _waitThread: waitThread,
+    _readThread: readThread,
   };
 
-  let _ = Event.subscribe(onClose, code => ret.exitCode = Some(code));
+  let _ = Event.subscribe(onClose, code => ret.exitCode := Some(code));
 
+  ret;
+};
+
+let spawn = (cmd: string, args: array(string)) => {
+  let {pid, stdin, stdout, onClose, exitCode, _} = _spawn(cmd, args);
+
+  let ret: t = {pid, stdin, stdout, onClose, exitCode};
+  ret;
+};
+
+let spawnSync = (cmd: string, args: array(string)) => {
+  let innerProc = _spawn(cmd, args);
+
+  let output = ref("");
+  let unsubscribe =
+    Event.subscribe(innerProc.stdout.onData, data =>
+      output := output^ ++ Bytes.to_string(data)
+    );
+
+  Thread.join(innerProc._waitThread);
+  Thread.join(innerProc._readThread);
+  unsubscribe();
+
+  let exitCode =
+    switch (innerProc.exitCode^) {
+    | Some(x) => x
+    | None => (-1)
+    };
+
+  let ret: processSync = {pid: innerProc.pid, stdout: output^, exitCode};
   ret;
 };

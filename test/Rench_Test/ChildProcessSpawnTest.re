@@ -11,14 +11,14 @@ let waitFor = f => {
 
 let waitForProcessExit = (proc: ChildProcess.t) => {
   waitFor(() =>
-    switch (proc.exitCode) {
+    switch (proc.exitCode^) {
     | None => false
     | Some(_) => true
     }
   );
 };
 
-describe("ChildProcess", ({test, _}) =>
+describe("ChildProcess", ({test, _}) => {
   test("spawn", ({expect}) => {
     let proc = ChildProcess.spawn("node", [|"-e", "console.log('v1000')"|]);
 
@@ -31,11 +31,19 @@ describe("ChildProcess", ({test, _}) =>
     waitForProcessExit(proc);
 
     /* Check that we got _some_ version */
-    expect.string(String.sub(data^, 0, 1)).toEqual("v");
+    expect.string(data^).toEqual("v1000\n");
 
-    switch (proc.exitCode) {
+    switch (proc.exitCode^) {
     | Some(x) => expect.int(x).toBe(0)
     | _ => ()
     };
-  })
-);
+  });
+
+  test("spawnSync", ({expect}) => {
+    let proc =
+      ChildProcess.spawnSync("node", [|"-e", "console.log('v1000')"|]);
+
+    expect.string(proc.stdout).toEqual("v1000\n");
+    expect.int(proc.exitCode).toBe(0);
+  });
+});
