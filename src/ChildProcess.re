@@ -16,7 +16,7 @@ type processSync = {
   pid: int,
   exitCode: int,
   stdout: string,
-}
+};
 
 type t = process;
 
@@ -27,7 +27,7 @@ type innerProcess = {
   onClose: Event.t(int),
   exitCode: ref(option(int)),
   _readThread: Thread.t,
-  _waitThread: Thread.t
+  _waitThread: Thread.t,
 };
 
 let _spawn = (cmd: string, args: array(string)) => {
@@ -47,7 +47,6 @@ let _spawn = (cmd: string, args: array(string)) => {
       pstdout,
       Unix.stderr,
     );
-
 
   Unix.close(pstdout);
   Unix.close(pstdin);
@@ -128,42 +127,31 @@ let _spawn = (cmd: string, args: array(string)) => {
 };
 
 let spawn = (cmd: string, args: array(string)) => {
-    let {pid, stdin, stdout, onClose, exitCode, _} = _spawn(cmd, args);
+  let {pid, stdin, stdout, onClose, exitCode, _} = _spawn(cmd, args);
 
-    let ret: t = {
-       pid,
-       stdin,
-       stdout,
-       onClose,
-       exitCode,
-    };
-    ret;
+  let ret: t = {pid, stdin, stdout, onClose, exitCode};
+  ret;
 };
 
 let spawnSync = (cmd: string, args: array(string)) => {
-    let innerProc = _spawn(cmd, args);   
+  let innerProc = _spawn(cmd, args);
 
-    let output = ref("");
-    let unsubscribe = Event.subscribe(innerProc.stdout.onData, (data) => {
-        output := output^ ++ Bytes.to_string(data);
-    })
+  let output = ref("");
+  let unsubscribe =
+    Event.subscribe(innerProc.stdout.onData, data =>
+      output := output^ ++ Bytes.to_string(data)
+    );
 
-    Thread.join(innerProc._waitThread);
-    Thread.join(innerProc._readThread);
-    unsubscribe();
+  Thread.join(innerProc._waitThread);
+  Thread.join(innerProc._readThread);
+  unsubscribe();
 
-
-    let exitCode = switch(innerProc.exitCode^) {
+  let exitCode =
+    switch (innerProc.exitCode^) {
     | Some(x) => x
-    | None => -1;
+    | None => (-1)
     };
 
-    let ret: processSync = {
-       pid: innerProc.pid,
-       stdout: output^,
-       exitCode,
-    };
-    ret;
+  let ret: processSync = {pid: innerProc.pid, stdout: output^, exitCode};
+  ret;
 };
-
-
