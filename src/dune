@@ -1,0 +1,4 @@
+(library
+    (name Rench)
+    (public_name Rench)
+    (libraries lwt lwt.unix console.lib))
