@@ -39,9 +39,9 @@ describe("ChildProcess", ({test, _}) => {
     };
   });
 
-
   test("spawnSync", ({expect}) => {
-    let proc = ChildProcess.spawnSync("node", [|"-e", "console.log('v1000')"|]);
+    let proc =
+      ChildProcess.spawnSync("node", [|"-e", "console.log('v1000')"|]);
 
     expect.string(proc.stdout).toEqual("v1000\n");
     expect.int(proc.exitCode).toBe(0);
