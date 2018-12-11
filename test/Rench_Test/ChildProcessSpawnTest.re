@@ -9,7 +9,7 @@ let waitFor = f => {
   };
 };
 
-let waitForProcessExit = (proc: ChildProcess.t) => {
+let waitForProcessExit = (proc: ChildProcess.process) => {
   waitFor(() =>
     switch (proc.exitCode^) {
     | None => false

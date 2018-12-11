@@ -1,24 +1,4 @@
-type writeFunction = Bytes.t => unit;
-
-type inputPipe = {write: writeFunction};
-
-type outputPipe = {onData: Event.t(Bytes.t)};
-
-type process = {
-  pid: int,
-  stdout: outputPipe,
-  stdin: inputPipe,
-  onClose: Event.t(int),
-  exitCode: ref(option(int)),
-};
-
-type processSync = {
-  pid: int,
-  exitCode: int,
-  stdout: string,
-};
-
-type t = process;
+include ChildProcessTypes;
 
 type innerProcess = {
   pid: int,
@@ -129,7 +109,7 @@ let _spawn = (cmd: string, args: array(string)) => {
 let spawn = (cmd: string, args: array(string)) => {
   let {pid, stdin, stdout, onClose, exitCode, _} = _spawn(cmd, args);
 
-  let ret: t = {pid, stdin, stdout, onClose, exitCode};
+  let ret: process = {pid, stdin, stdout, onClose, exitCode};
   ret;
 };
 
