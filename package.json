@@ -4,9 +4,10 @@
   "description": "Reason Native Cross-platform Helpers - a Node-inspired API for Reason",
   "main": "index.js",
   "esy": {
-    "build": "refmterr dune build --root . -j 4",
+    "build": "refmterr dune build --root . -j4",
     "install": [
-        "esy-installer Rench"
+        "esy-installer Rench.install",
+        "esy-installer Rench_Test.install"
     ]
   },
   "scripts": {
@@ -28,7 +29,8 @@
     "@esy-ocaml/reason": "*",
     "refmterr": "*",
     "ocaml": "~4.6.0",
-    "@reason-native/console": "*"
+    "@reason-native/console": "*",
+    "@reason-native/rely": "*"
   },
   "resolutions": {
     "@esy-ocaml/reason": "facebook/reason#ab49908",

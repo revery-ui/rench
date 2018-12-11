@@ -1,0 +1,7 @@
+(library
+    (name Rench_Test)
+    (public_name Rench_Test)
+    (flags (:standard (-w -39)))
+    (ocamlopt_flags -linkall -g)
+    (libraries rely.lib)
+)
