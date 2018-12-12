@@ -85,7 +85,7 @@ let _spawn = (cmd: string, args: array(string)) => {
   let retStdout: outputPipe = {onData: stdout_onData};
 
   let stdinClose = () => {
-      Unix.close(stdin);
+    Unix.close(stdin);
   };
 
   let stdinWrite = bytes => {
@@ -93,10 +93,7 @@ let _spawn = (cmd: string, args: array(string)) => {
     ();
   };
 
-  let retStdin: inputPipe = {
-      write: stdinWrite,
-      close: stdinClose
-  };
+  let retStdin: inputPipe = {write: stdinWrite, close: stdinClose};
 
   let ret: innerProcess = {
     pid,
@@ -131,7 +128,7 @@ let spawnSync =
     );
 
   switch (opts.input) {
-  | Some(x) => 
+  | Some(x) =>
     innerProc.stdin.write(Bytes.of_string(x));
     innerProc.stdin.close();
   | None => ()

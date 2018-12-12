@@ -2,8 +2,8 @@ type closeFunction = unit => unit;
 type writeFunction = Bytes.t => unit;
 
 type inputPipe = {
-    write: writeFunction,
-    close: closeFunction
+  write: writeFunction,
+  close: closeFunction,
 };
 
 type outputPipe = {onData: Event.t(Bytes.t)};
