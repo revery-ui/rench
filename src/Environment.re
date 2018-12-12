@@ -2,7 +2,7 @@
  * Environment
  */
 
-let whichSync = (executableName: string) => {
+let which = (executableName: string) => {
   /* TODO: An alternative implementation would be to go through the PATH */
   let whichCommand = Sys.win32 ? "where" : "which";
 

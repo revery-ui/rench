@@ -6,6 +6,6 @@
  */
 
 
-let whichSync: string => string;
+let which: string => string;
 
 let newLine: string;
