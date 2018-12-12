@@ -54,7 +54,7 @@ describe("ChildProcess", ({test, describe}) => {
       expect.int(proc.exitCode).toBe(0);
     });
 
-    test("input parameter", ({expect}) => {
+    test("i/o via readline", ({expect}) => {
       /* Create a simple echo script */
       let script = {|
         let readline = require('readline');
@@ -74,6 +74,22 @@ describe("ChildProcess", ({test, describe}) => {
       let proc = ChildProcess.spawnSync(~opts, "node", [|"-e", script|]);
 
       expect.string(proc.stdout).toEqual("Testing 123\n");
+      expect.int(proc.exitCode).toBe(0);
+    });
+
+    test("i/o via pipes", ({expect}) => {
+      /* Create a simple echo script */
+      let script = {|
+        process.stdin.on("data", (d) => {
+            console.log(d.toString("utf8"));
+        });
+      |};
+
+      let opts =
+        ChildProcess.SpawnSyncOptions.create(~input="Testing 456\n", ());
+      let proc = ChildProcess.spawnSync(~opts, "node", [|"-e", script|]);
+
+      expect.string(String.trim(proc.stdout)).toEqual("Testing 456");
       expect.int(proc.exitCode).toBe(0);
     });
   });
