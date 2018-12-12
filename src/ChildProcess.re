@@ -113,7 +113,8 @@ let spawn = (cmd: string, args: array(string)) => {
   ret;
 };
 
-let spawnSync = (~opts=SpawnSyncOptions.default, cmd: string, args: array(string)) => {
+let spawnSync =
+    (~opts=SpawnSyncOptions.default, cmd: string, args: array(string)) => {
   let innerProc = _spawn(cmd, args);
 
   let output = ref("");
@@ -123,7 +124,7 @@ let spawnSync = (~opts=SpawnSyncOptions.default, cmd: string, args: array(string
     );
 
   switch (opts.input) {
-  | Some(x) => innerProc.stdin.write(Bytes.of_string(x));  
+  | Some(x) => innerProc.stdin.write(Bytes.of_string(x))
   | None => ()
   };
 
