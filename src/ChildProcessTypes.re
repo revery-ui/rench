@@ -17,4 +17,3 @@ type processSync = {
   exitCode: int,
   stdout: string,
 };
-

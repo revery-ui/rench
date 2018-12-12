@@ -1,17 +1,11 @@
-/* Event.re */
+/* 
+ * Environment
+ * 
+ * Module for working with the OS / Environment variables
+ * Similiar to the 'os'/process modules in Node
+ */
 
-type cb('a) = 'a => unit;
 
-type t('a) = ref(list(cb('a)));
+let whichSync: string => string;
 
-let create = () => ref([]);
-
-let subscribe = (evt: t('a), f: cb('a)) => {
-  evt := List.append(evt^, [f]);
-  let unsubscribe = () => {
-    evt := List.filter(f => f !== f, evt^);
-  };
-  unsubscribe;
-};
-
-let dispatch = (evt: t('a), v: 'a) => List.iter(c => c(v), evt^);
+let newLine: string;

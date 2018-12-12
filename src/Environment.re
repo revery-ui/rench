@@ -1,17 +1,13 @@
-/* Event.re */
+/*
+ * Environment
+ */
 
-type cb('a) = 'a => unit;
+let whichSync = (executableName: string) => {
+  /* TODO: An alternative implementation would be to go through the PATH */
+  let whichCommand = Sys.win32 ? "where" : "which";
 
-type t('a) = ref(list(cb('a)));
-
-let create = () => ref([]);
-
-let subscribe = (evt: t('a), f: cb('a)) => {
-  evt := List.append(evt^, [f]);
-  let unsubscribe = () => {
-    evt := List.filter(f => f !== f, evt^);
-  };
-  unsubscribe;
+  let proc = ChildProcess.spawnSync(whichCommand, [|executableName|]);
+  String.trim(proc.stdout);
 };
 
-let dispatch = (evt: t('a), v: 'a) => List.iter(c => c(v), evt^);
+let newLine = Sys.win32 ? "\r\n" : "\n";
