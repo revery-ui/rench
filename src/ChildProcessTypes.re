@@ -22,3 +22,13 @@ type processSync = {
   stdout: string,
 };
 
+module SpawnSyncOptions = {
+  type t = {input: option(string)};
+
+  let default: t = {input: None};
+
+  let create = (~input=?, ()) => {
+    let ret: t = {input: input};
+    ret;
+  };
+};

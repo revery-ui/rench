@@ -1,4 +1,4 @@
-include ChildProcessTypes;
+/* include ChildProcessTypes; */
 
 type innerProcess = {
   pid: int,
@@ -120,7 +120,8 @@ let spawn = (cmd: string, args: array(string)) => {
   ret;
 };
 
-let spawnSync = (cmd: string, args: array(string)) => {
+let spawnSync =
+    (~opts=SpawnSyncOptions.default, cmd: string, args: array(string)) => {
   let innerProc = _spawn(cmd, args);
 
   let output = ref("");
