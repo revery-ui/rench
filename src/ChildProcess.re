@@ -1,4 +1,4 @@
-/* include ChildProcessTypes; */
+include ChildProcessTypes;
 
 type innerProcess = {
   pid: int,
@@ -133,7 +133,7 @@ let spawnSync =
   switch (opts.input) {
   | Some(x) => 
     innerProc.stdin.write(Bytes.of_string(x));
-    /* innerProc.stdin.close(); */
+    innerProc.stdin.close();
   | None => ()
   };
 
