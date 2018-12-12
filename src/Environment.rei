@@ -5,7 +5,6 @@
  * Similiar to the 'os'/process modules in Node
  */
 
-
 let which: string => string;
 
 let newLine: string;
