@@ -113,7 +113,8 @@ let spawn = (cmd: string, args: array(string)) => {
   ret;
 };
 
-let spawnSync = (cmd: string, args: array(string)) => {
+let spawnSync =
+    (~opts=SpawnSyncOptions.default, cmd: string, args: array(string)) => {
   let innerProc = _spawn(cmd, args);
 
   let output = ref("");
@@ -121,6 +122,11 @@ let spawnSync = (cmd: string, args: array(string)) => {
     Event.subscribe(innerProc.stdout.onData, data =>
       output := output^ ++ Bytes.to_string(data)
     );
+
+  switch (opts.input) {
+  | Some(x) => innerProc.stdin.write(Bytes.of_string(x))
+  | None => ()
+  };
 
   Thread.join(innerProc._waitThread);
   Thread.join(innerProc._readThread);

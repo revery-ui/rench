@@ -18,9 +18,12 @@ let waitForProcessExit = (proc: ChildProcess.process) => {
   );
 };
 
-describe("ChildProcess", ({test, _}) => {
+describe("ChildProcess", ({test, describe}) => {
   test("spawn", ({expect}) => {
-    let proc = ChildProcess.spawn("node", [|"-e", "console.log('v1000')"|]);
+    let script = {|
+        console.log('v1000');
+    |};
+    let proc = ChildProcess.spawn("node", [|"-e", script|]);
 
     let data = ref("");
     let _ =
@@ -39,11 +42,39 @@ describe("ChildProcess", ({test, _}) => {
     };
   });
 
-  test("spawnSync", ({expect}) => {
-    let proc =
-      ChildProcess.spawnSync("node", [|"-e", "console.log('v1000')"|]);
+  describe("spawnSync", ({test, _}) => {
+    test("process creation", ({expect}) => {
+      let script = {|
+            console.log('v1000');
+        |};
 
-    expect.string(proc.stdout).toEqual("v1000\n");
-    expect.int(proc.exitCode).toBe(0);
+      let proc = ChildProcess.spawnSync("node", [|"-e", script|]);
+
+      expect.string(proc.stdout).toEqual("v1000\n");
+      expect.int(proc.exitCode).toBe(0);
+    });
+
+    test("input parameter", ({expect}) => {
+      /* Create a simple echo script */
+      let script = {|
+        let readline = require('readline');
+        let rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+            terminal: false,
+        });
+        rl.on('line', (l) => {
+            console.log(l);
+            process.exit(0);
+        })
+      |};
+
+      let opts =
+        ChildProcess.SpawnSyncOptions.create(~input="Testing 123\n", ());
+      let proc = ChildProcess.spawnSync(~opts, "node", [|"-e", script|]);
+
+      expect.string(proc.stdout).toEqual("Testing 123\n");
+      expect.int(proc.exitCode).toBe(0);
+    });
   });
 });
