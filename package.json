@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@opam/dune": "*",
+    "@opam/fpath": "^0.7.2",
     "@opam/lambda-term": "*",
     "@opam/lwt": "*",
     "@esy-ocaml/reason": "*",
