@@ -1,6 +1,8 @@
 open TestFramework;
 
 module ChildProcess = Rench.ChildProcess;
+module Environment = Rench.Environment;
+module EnvironmentVariables = Rench.EnvironmentVariables;
 module Event = Rench.Event;
 
 let waitFor = f => {
@@ -104,6 +106,22 @@ describe("ChildProcess", ({test, describe}) => {
       |> String.trim;
 
       expect.string(out).toEqual(expectedPath);
+    });
+
+    test("picks up set environment variable", ({expect}) => {
+
+          let script = {|
+                console.log(process.env.RENCH_TEST_VARIABLE);
+          |};
+
+          let currEnv = Environment.getEnvironmentVariables();
+          let env = EnvironmentVariables.setValue(currEnv, "RENCH_TEST_VARIABLE", "0451");
+
+      let out = ChildProcess.spawnSync(~env, "node", [|"-e", script|])
+      |> (p) => p.stdout
+      |> String.trim;
+
+      expect.string(out).toEqual("0451");
     });
   });
 });
