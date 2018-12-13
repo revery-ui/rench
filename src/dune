@@ -1,4 +1,5 @@
 (library
     (name Rench)
     (public_name Rench)
+    (flags (:standard -w -21))
     (libraries fpath lwt lwt.unix console.lib))
