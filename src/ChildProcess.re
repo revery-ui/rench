@@ -11,11 +11,11 @@ type innerProcess = {
 };
 
 let _formatEnvironmentVariables = (env: EnvironmentVariables.t) => {
-    let f = (key, value, prev) => {
-        Array.append(prev, [|key ++ "=" ++ value|]);
-    };
+  let f = (key, value, prev) => {
+    Array.append(prev, [|key ++ "=" ++ value|]);
+  };
 
-    EnvironmentVariables.fold(~f, env, [||]);
+  EnvironmentVariables.fold(~f, env, [||]);
 };
 
 let _spawn = (cmd: string, args: array(string), env: EnvironmentVariables.t) => {
@@ -121,7 +121,12 @@ let _spawn = (cmd: string, args: array(string), env: EnvironmentVariables.t) => 
   ret;
 };
 
-let spawn = (~env=EnvironmentUtility.getEnvironmentVariables(), cmd: string, args: array(string)) => {
+let spawn =
+    (
+      ~env=EnvironmentUtility.getEnvironmentVariables(),
+      cmd: string,
+      args: array(string),
+    ) => {
   let {pid, stdin, stdout, onClose, exitCode, _} = _spawn(cmd, args, env);
 
   let ret: process = {pid, stdin, stdout, onClose, exitCode};
@@ -129,7 +134,12 @@ let spawn = (~env=EnvironmentUtility.getEnvironmentVariables(), cmd: string, arg
 };
 
 let spawnSync =
-    (~env=EnvironmentUtility.getEnvironmentVariables(), ~opts=SpawnSyncOptions.default, cmd: string, args: array(string)) => {
+    (
+      ~env=EnvironmentUtility.getEnvironmentVariables(),
+      ~opts=SpawnSyncOptions.default,
+      cmd: string,
+      args: array(string),
+    ) => {
   let innerProc = _spawn(cmd, args, env);
 
   let output = ref("");
