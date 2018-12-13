@@ -8,3 +8,5 @@
 let which: string => option(string);
 
 let newLine: string;
+
+let getEnvironmentVariables: unit => EnvironmentVariables.t;

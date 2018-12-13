@@ -22,3 +22,10 @@ let which = (executableName: string) => {
 };
 
 let newLine = Sys.win32 ? "\r\n" : "\n";
+
+let getEnvironmentVariables = () => {
+    Unix.environment()
+    |> Array.map(EnvironmentUtility.parseEnv)
+    |> Array.to_list
+    |> EnvironmentVariables.create
+};
