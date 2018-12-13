@@ -92,5 +92,18 @@ describe("ChildProcess", ({test, describe}) => {
       expect.string(String.trim(proc.stdout)).toEqual("Testing 456");
       expect.int(proc.exitCode).toBe(0);
     });
+
+    test("default environment variable set if nothing passed", ({expect}) => {
+        let expectedPath = Sys.getenv("PATH");   
+          let script = {|
+                console.log(process.env.PATH);
+          |};
+
+      let out = ChildProcess.spawnSync("node", [|"-e", script|])
+      |> (p) => p.stdout
+      |> String.trim;
+
+      expect.string(out).toEqual(expectedPath);
+    });
   });
 });
