@@ -1,4 +1,4 @@
 (library
     (name Rench)
     (public_name Rench)
-    (libraries lwt lwt.unix console.lib))
+    (libraries fpath lwt lwt.unix console.lib))

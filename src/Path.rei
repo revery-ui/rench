@@ -10,3 +10,7 @@
  * in environment variables
  */
 let pathSeparator: string;
+
+let dirname: string => string;
+
+let normalize: string => string;
