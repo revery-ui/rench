@@ -24,3 +24,7 @@ let getValue = (env: t, name: string) => {
 let setValue = (env: t, name: string, v: string) => {
   StringMap.add(name, v, env);
 };
+
+let fold = (~f, env: t, curr: 'a) => {
+  StringMap.fold(f, env, curr);
+};

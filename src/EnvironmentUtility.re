@@ -10,5 +10,13 @@ let parseEnv = (item: string) => {
     | _ => name
     };
   let value = String.sub(item, idx + 1, String.length(item) - idx - 1);
+
   (name, value);
+};
+
+let getEnvironmentVariables = () => {
+  Unix.environment()
+  |> Array.map(parseEnv)
+  |> Array.to_list
+  |> EnvironmentVariables.create;
 };

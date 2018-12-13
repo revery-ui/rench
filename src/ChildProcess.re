@@ -10,7 +10,15 @@ type innerProcess = {
   _waitThread: Thread.t,
 };
 
-let _spawn = (cmd: string, args: array(string)) => {
+let _formatEnvironmentVariables = (env: EnvironmentVariables.t) => {
+  let f = (key, value, prev) => {
+    Array.append(prev, [|key ++ "=" ++ value|]);
+  };
+
+  EnvironmentVariables.fold(~f, env, [||]);
+};
+
+let _spawn = (cmd: string, args: array(string), env: EnvironmentVariables.t) => {
   let (pstdin, stdin) = Unix.pipe();
   let (stdout, pstdout) = Unix.pipe();
 
@@ -19,10 +27,13 @@ let _spawn = (cmd: string, args: array(string)) => {
   Unix.set_close_on_exec(pstdout);
   Unix.set_close_on_exec(stdout);
 
+  let formattedEnv = _formatEnvironmentVariables(env);
+
   let pid =
-    Unix.create_process(
+    Unix.create_process_env(
       cmd,
       Array.append([|cmd|], args),
+      formattedEnv,
       pstdin,
       pstdout,
       Unix.stderr,
@@ -110,16 +121,26 @@ let _spawn = (cmd: string, args: array(string)) => {
   ret;
 };
 
-let spawn = (cmd: string, args: array(string)) => {
-  let {pid, stdin, stdout, onClose, exitCode, _} = _spawn(cmd, args);
+let spawn =
+    (
+      ~env=EnvironmentUtility.getEnvironmentVariables(),
+      cmd: string,
+      args: array(string),
+    ) => {
+  let {pid, stdin, stdout, onClose, exitCode, _} = _spawn(cmd, args, env);
 
   let ret: process = {pid, stdin, stdout, onClose, exitCode};
   ret;
 };
 
 let spawnSync =
-    (~opts=SpawnSyncOptions.default, cmd: string, args: array(string)) => {
-  let innerProc = _spawn(cmd, args);
+    (
+      ~env=EnvironmentUtility.getEnvironmentVariables(),
+      ~opts=SpawnSyncOptions.default,
+      cmd: string,
+      args: array(string),
+    ) => {
+  let innerProc = _spawn(cmd, args, env);
 
   let output = ref("");
   let unsubscribe =
