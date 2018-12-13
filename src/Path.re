@@ -5,3 +5,8 @@ let dirname = (s) => {
     |> Fpath.parent
     |> Fpath.to_string
 };
+
+let normalize = (s) => {
+    Fpath.v(s)
+    |> Fpath.to_string
+};
