@@ -136,11 +136,14 @@ describe("ChildProcess", ({test, describe}) => {
         ChildProcess.spawnSync("node", [|"-e", script|])
         |> (p => p.stdout |> String.trim);
 
-      let last = String.split_on_char('\n', out)
+      let str = String.split_on_char('\n', out);
+
+      let last = str
       |> List.rev
       |> List.hd;
 
       expect.string(last).toEqual("WRITING LINE: |500000|");
+      expect.int(List.length(str)).toBe(500001);
     })
   });
 });
