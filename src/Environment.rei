@@ -10,3 +10,5 @@ let which: string => option(string);
 let newLine: string;
 
 let getEnvironmentVariables: unit => EnvironmentVariables.t;
+
+let getEnvironmentVariable: string => option(string);
