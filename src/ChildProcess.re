@@ -53,18 +53,31 @@ let _spawn = (cmd: string, args: array(string), env: EnvironmentVariables.t) => 
         let buffer = Buffer.create(8192);
         let bytes = Bytes.create(8192);
 
-        while (isRunning^) {
-          Thread.wait_read(stdout);
-          let n = Unix.read(stdout, bytes, 0, 8192);
+        let isReading = ref(true);
 
-          if (n > 0) {
-            let sub = Bytes.sub(bytes, 0, n);
-            Buffer.add_bytes(buffer, sub);
+        let flush = () => {
+          let out = Buffer.to_bytes(buffer);
+          Buffer.clear(buffer);
+          Event.dispatch(stdout_onData, out);
+        };
 
-            if (n < 8192) {
-              let out = Buffer.to_bytes(buffer);
-              Buffer.clear(buffer);
-              Event.dispatch(stdout_onData, out);
+        while (isReading^) {
+          let ready = Thread.wait_timed_read(stdout, 0.01);
+          if (ready) {
+            let n = Unix.read(stdout, bytes, 0, 8192);
+
+            if (n > 0) {
+              let sub = Bytes.sub(bytes, 0, n);
+              Buffer.add_bytes(buffer, sub);
+
+              if (n < 8192) {
+                flush();
+              };
+            } else if (! isRunning^) {
+              if (Buffer.length(buffer) > 0) {
+                flush();
+              };
+              isReading := false;
             };
           };
         };
@@ -149,11 +162,11 @@ let spawnSync =
     );
 
   switch (opts.input) {
-  | Some(x) =>
-    innerProc.stdin.write(Bytes.of_string(x));
-    innerProc.stdin.close();
+  | Some(x) => innerProc.stdin.write(Bytes.of_string(x))
   | None => ()
   };
+
+  innerProc.stdin.close();
 
   Thread.join(innerProc._waitThread);
   Thread.join(innerProc._readThread);

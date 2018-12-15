@@ -123,5 +123,25 @@ describe("ChildProcess", ({test, describe}) => {
 
       expect.string(out).toEqual("0451");
     });
+
+    test("handles large amounts of output", ({expect}) => {
+      let script = {|
+            const ITERATIONS = 1000001;
+            for (let i = 0; i < ITERATIONS; i++) {
+                console.log("WRITING LINE: --------|" + i.toString() + "|--------");
+            }
+          |};
+
+      let out =
+        ChildProcess.spawnSync("node", [|"-e", script|])
+        |> (p => p.stdout |> String.trim);
+
+      let str = String.split_on_char('\n', out);
+
+      let last = str |> List.rev |> List.hd;
+
+      expect.string(last).toEqual("WRITING LINE: --------|1000000|--------");
+      expect.int(List.length(str)).toBe(1000001);
+    });
   });
 });
