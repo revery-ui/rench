@@ -147,21 +147,31 @@ describe("ChildProcess", ({test, describe}) => {
     exception NoNodeAvailable(string);
 
     test("respects cwd", ({expect}) => {
-        let nodeDirectory = Rench.Environment.which("node")
-            |> (v => switch(v) {
-               | Some(d) => d
-               | None => raise(NoNodeAvailable("unable to find node"))
-            })
-            |> Rench.Path.dirname;
+      let nodeDirectory =
+        Rench.Environment.which("node")
+        |> (
+          v =>
+            switch (v) {
+            | Some(d) => d
+            | None => raise(NoNodeAvailable("unable to find node"))
+            }
+        )
+        |> Rench.Path.dirname;
 
-        let script = {|
+      let script = {|
             console.log(process.cwd())
         |};
 
-        let out = ChildProcess.spawnSync(~cwd=Some(nodeDirectory), "node", [|"-e", script|])
-        |> (p => p.stdout) |> String.trim;
+      let out =
+        ChildProcess.spawnSync(
+          ~cwd=Some(nodeDirectory),
+          "node",
+          [|"-e", script|],
+        )
+        |> (p => p.stdout)
+        |> String.trim;
 
-        expect.string(out).toEqual(nodeDirectory);
+      expect.string(out).toEqual(nodeDirectory);
     });
   });
 });

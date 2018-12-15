@@ -19,25 +19,30 @@ let _formatEnvironmentVariables = (env: EnvironmentVariables.t) => {
 };
 
 let _withWorkingDirectory = (wd: option(string), f) => {
+  let currentDirectory = Sys.getcwd();
 
-    let currentDirectory = Sys.getcwd();
+  switch (wd) {
+  | None => ()
+  | Some(x) => Sys.chdir(x)
+  };
 
-    switch (wd) {
-    | None => ()
-    | Some(x) => Sys.chdir(x);
-    };
+  let ret = f();
 
-    let ret = f();
+  switch (wd) {
+  | None => ()
+  | Some(_) => Sys.chdir(currentDirectory)
+  };
 
-    switch (wd) {
-    | None => ()
-    | Some(_) => Sys.chdir(currentDirectory);
-    };
-
-    ret;
+  ret;
 };
 
-let _spawn = (cmd: string, args: array(string), env: EnvironmentVariables.t, cwd: option(string)) => {
+let _spawn =
+    (
+      cmd: string,
+      args: array(string),
+      env: EnvironmentVariables.t,
+      cwd: option(string),
+    ) => {
   let (pstdin, stdin) = Unix.pipe();
   let (stdout, pstdout) = Unix.pipe();
 
@@ -49,14 +54,16 @@ let _spawn = (cmd: string, args: array(string), env: EnvironmentVariables.t, cwd
   let formattedEnv = _formatEnvironmentVariables(env);
 
   let pid =
-    _withWorkingDirectory(cwd, () => Unix.create_process_env(
-      cmd,
-      Array.append([|cmd|], args),
-      formattedEnv,
-      pstdin,
-      pstdout,
-      Unix.stderr,
-    ));
+    _withWorkingDirectory(cwd, () =>
+      Unix.create_process_env(
+        cmd,
+        Array.append([|cmd|], args),
+        formattedEnv,
+        pstdin,
+        pstdout,
+        Unix.stderr,
+      )
+    );
 
   Unix.close(pstdout);
   Unix.close(pstdin);
@@ -160,7 +167,8 @@ let spawn =
       cmd: string,
       args: array(string),
     ) => {
-  let {pid, stdin, stdout, onClose, exitCode, _} = _spawn(cmd, args, env, cwd);
+  let {pid, stdin, stdout, onClose, exitCode, _} =
+    _spawn(cmd, args, env, cwd);
 
   let ret: process = {pid, stdin, stdout, onClose, exitCode};
   ret;
