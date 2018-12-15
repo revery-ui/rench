@@ -53,7 +53,7 @@ let _spawn = (cmd: string, args: array(string), env: EnvironmentVariables.t) => 
         let buffer = Buffer.create(8192);
         let bytes = Bytes.create(8192);
 
-        let isReading = ref(true); 
+        let isReading = ref(true);
 
         let flush = () => {
           let out = Buffer.to_bytes(buffer);
@@ -61,38 +61,32 @@ let _spawn = (cmd: string, args: array(string), env: EnvironmentVariables.t) => 
           Event.dispatch(stdout_onData, out);
         };
 
-                      prerr_endline ("Started!");
-
         while (isReading^) {
-            prerr_endline ("--- Waiting.");
-          /* Thread.wait_read(stdout); */
-          let n = Unix.read(stdout, bytes, 0, 8192);
+          let ready = Thread.wait_timed_read(stdout, 0.01);
+          if (ready) {
+            let n = Unix.read(stdout, bytes, 0, 8192);
 
+            if (n > 0) {
+              let sub = Bytes.sub(bytes, 0, n);
+              Buffer.add_bytes(buffer, sub);
 
-            /* prerr_endline ("--- Read " ++ string_of_int(n) ++ " bytes."); */
-          if (n > 0) {
-            let sub = Bytes.sub(bytes, 0, n);
-            Buffer.add_bytes(buffer, sub);
-
-            if (n < 8192) {
+              if (n < 8192) {
                 flush();
+              };
+            } else if (! isRunning^) {
+              if (Buffer.length(buffer) > 0) {
+                flush();
+              };
+              isReading := false;
             };
-          } else if(!isRunning^) {
-              prerr_endline ("Done!");
-             if (Buffer.length(buffer) > 0) {
-                flush();
-             }
-             isReading := false;
           };
         };
-        prerr_endline ("Done");
       },
       (stdout, stdout_onData),
     );
 
   let _dispose = exitCode => {
     isRunning := false;
-               prerr_endline ("Exiting");
     Event.dispatch(onClose, exitCode);
   };
 
@@ -168,9 +162,8 @@ let spawnSync =
     );
 
   switch (opts.input) {
-  | Some(x) =>
-    innerProc.stdin.write(Bytes.of_string(x));
-  | None =>  ()
+  | Some(x) => innerProc.stdin.write(Bytes.of_string(x))
+  | None => ()
   };
 
   innerProc.stdin.close();

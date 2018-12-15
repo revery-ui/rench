@@ -126,9 +126,9 @@ describe("ChildProcess", ({test, describe}) => {
 
     test("handles large amounts of output", ({expect}) => {
       let script = {|
-            const ITERATIONS = 500001;
+            const ITERATIONS = 1000001;
             for (let i = 0; i < ITERATIONS; i++) {
-                console.log("WRITING LINE: |" + i.toString() + "|");
+                console.log("WRITING LINE: --------|" + i.toString() + "|--------");
             }
           |};
 
@@ -138,12 +138,10 @@ describe("ChildProcess", ({test, describe}) => {
 
       let str = String.split_on_char('\n', out);
 
-      let last = str
-      |> List.rev
-      |> List.hd;
+      let last = str |> List.rev |> List.hd;
 
-      expect.string(last).toEqual("WRITING LINE: |500000|");
-      expect.int(List.length(str)).toBe(500001);
-    })
+      expect.string(last).toEqual("WRITING LINE: --------|1000000|--------");
+      expect.int(List.length(str)).toBe(1000001);
+    });
   });
 });
