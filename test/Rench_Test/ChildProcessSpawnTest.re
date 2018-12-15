@@ -143,5 +143,35 @@ describe("ChildProcess", ({test, describe}) => {
       expect.string(last).toEqual("WRITING LINE: --------|1000000|--------");
       expect.int(List.length(str)).toBe(1000001);
     });
+
+    exception NoNodeAvailable(string);
+
+    test("respects cwd", ({expect}) => {
+      let nodeDirectory =
+        Rench.Environment.which("node")
+        |> (
+          v =>
+            switch (v) {
+            | Some(d) => d
+            | None => raise(NoNodeAvailable("unable to find node"))
+            }
+        )
+        |> Rench.Path.dirname;
+
+      let script = {|
+            console.log(process.cwd())
+        |};
+
+      let out =
+        ChildProcess.spawnSync(
+          ~cwd=Some(nodeDirectory),
+          "node",
+          [|"-e", script|],
+        )
+        |> (p => p.stdout)
+        |> String.trim;
+
+      expect.string(out).toEqual(nodeDirectory);
+    });
   });
 });

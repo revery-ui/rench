@@ -18,7 +18,31 @@ let _formatEnvironmentVariables = (env: EnvironmentVariables.t) => {
   EnvironmentVariables.fold(~f, env, [||]);
 };
 
-let _spawn = (cmd: string, args: array(string), env: EnvironmentVariables.t) => {
+let _withWorkingDirectory = (wd: option(string), f) => {
+  let currentDirectory = Sys.getcwd();
+
+  switch (wd) {
+  | None => ()
+  | Some(x) => Sys.chdir(x)
+  };
+
+  let ret = f();
+
+  switch (wd) {
+  | None => ()
+  | Some(_) => Sys.chdir(currentDirectory)
+  };
+
+  ret;
+};
+
+let _spawn =
+    (
+      cmd: string,
+      args: array(string),
+      env: EnvironmentVariables.t,
+      cwd: option(string),
+    ) => {
   let (pstdin, stdin) = Unix.pipe();
   let (stdout, pstdout) = Unix.pipe();
 
@@ -30,13 +54,15 @@ let _spawn = (cmd: string, args: array(string), env: EnvironmentVariables.t) => 
   let formattedEnv = _formatEnvironmentVariables(env);
 
   let pid =
-    Unix.create_process_env(
-      cmd,
-      Array.append([|cmd|], args),
-      formattedEnv,
-      pstdin,
-      pstdout,
-      Unix.stderr,
+    _withWorkingDirectory(cwd, () =>
+      Unix.create_process_env(
+        cmd,
+        Array.append([|cmd|], args),
+        formattedEnv,
+        pstdin,
+        pstdout,
+        Unix.stderr,
+      )
     );
 
   Unix.close(pstdout);
@@ -136,11 +162,13 @@ let _spawn = (cmd: string, args: array(string), env: EnvironmentVariables.t) => 
 
 let spawn =
     (
+      ~cwd=None,
       ~env=EnvironmentUtility.getEnvironmentVariables(),
       cmd: string,
       args: array(string),
     ) => {
-  let {pid, stdin, stdout, onClose, exitCode, _} = _spawn(cmd, args, env);
+  let {pid, stdin, stdout, onClose, exitCode, _} =
+    _spawn(cmd, args, env, cwd);
 
   let ret: process = {pid, stdin, stdout, onClose, exitCode};
   ret;
@@ -148,12 +176,13 @@ let spawn =
 
 let spawnSync =
     (
+      ~cwd=None,
       ~env=EnvironmentUtility.getEnvironmentVariables(),
       ~opts=SpawnSyncOptions.default,
       cmd: string,
       args: array(string),
     ) => {
-  let innerProc = _spawn(cmd, args, env);
+  let innerProc = _spawn(cmd, args, env, cwd);
 
   let output = ref("");
   let unsubscribe =
