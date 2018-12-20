@@ -12,3 +12,7 @@ let newLine: string;
 let getEnvironmentVariables: unit => EnvironmentVariables.t;
 
 let getEnvironmentVariable: string => option(string);
+
+let getWorkingDirectory: unit => string;
+
+let getExecutingDirectory: unit => string;

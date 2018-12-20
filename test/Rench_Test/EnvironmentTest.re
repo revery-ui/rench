@@ -2,6 +2,7 @@ open TestFramework;
 
 module Environment = Rench.Environment;
 module EnvironmentVariables = Rench.EnvironmentVariables;
+module Path = Rench.Path;
 
 describe("Environment", ({describe, _}) => {
   describe("which", ({test, _}) =>
@@ -27,4 +28,16 @@ describe("Environment", ({describe, _}) => {
       };
     })
   );
+  describe("getExecutingDirectory", ({test, _}) => {
+    test("returns correct path", ({expect}) => {
+      let testRunnerPath = Environment.which("TestRunner");
+      switch (testRunnerPath) {
+      | Some(v) =>
+          let expected = Path.dirname(v);
+          let xd = Environment.getExecutingDirectory();     
+          expect.string(expected).toEqual(xd);
+      | None => expect.bool(true).toBeFalse();
+      };
+    });
+  });
 });
