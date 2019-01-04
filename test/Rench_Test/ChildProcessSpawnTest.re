@@ -96,9 +96,10 @@ describe("ChildProcess", ({test, describe}) => {
     });
 
     test("default environment variable set if nothing passed", ({expect}) => {
-      let expectedPath = Sys.getenv("PATH");
+      /* OCAML_TOPLEVEL_PATH is set by default */
+      let expectedPath = Sys.getenv("OCAML_TOPLEVEL_PATH");
       let script = {|
-                console.log(process.env.PATH);
+                console.log(process.env["OCAML_TOPLEVEL_PATH"]);
           |};
 
       let out =

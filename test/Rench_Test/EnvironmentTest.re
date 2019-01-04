@@ -30,7 +30,7 @@ describe("Environment", ({describe, _}) => {
   );
   describe("getExecutingDirectory", ({test, _}) => {
     test("returns correct path", ({expect}) => {
-      let testRunnerPath = Environment.which("TestRunner");
+      let testRunnerPath = Environment.which("TestRunner.exe");
       switch (testRunnerPath) {
       | Some(v) =>
           let expected = Path.dirname(v);
