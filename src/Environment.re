@@ -29,3 +29,11 @@ let getEnvironmentVariable = (name: string) => {
   let env = getEnvironmentVariables();
   EnvironmentVariables.getValue(env, name);
 };
+
+let getWorkingDirectory = () => {
+    Sys.getcwd();
+};
+
+let getExecutingDirectory = () => {
+    Filename.dirname(Sys.argv[0]);
+};
