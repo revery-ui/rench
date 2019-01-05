@@ -3,3 +3,8 @@
     (public_name TestRunner.exe)
     (libraries Rench_Test)
     (package Rench_Test))
+
+(install
+    (section bin)
+    (package Rench_Test)
+    (files TestFile.txt))
