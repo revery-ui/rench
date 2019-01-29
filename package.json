@@ -29,7 +29,7 @@
     "@opam/lwt": "*",
     "@esy-ocaml/reason": "*",
     "refmterr": "*",
-    "ocaml": "~4.6.0",
+    "ocaml": "^4.6.0",
     "@reason-native/console": "*",
     "@reason-native/rely": "*"
   },
@@ -40,6 +40,6 @@
   },
   "devDependencies": {
     "@opam/merlin": "3.2.2",
-    "ocaml": "~4.6.0"
+    "ocaml": "^4.6.0"
   }
 }
