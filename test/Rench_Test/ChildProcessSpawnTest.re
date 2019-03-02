@@ -20,7 +20,7 @@ let waitForProcessExit = (proc: ChildProcess.process) => {
   );
 };
 
-describe("ChildProcess", ({test, describe}) => {
+describe("ChildProcess", ({test, describe, _}) => {
   test("spawn", ({expect}) => {
     let script = {|
         console.log('v1000');
