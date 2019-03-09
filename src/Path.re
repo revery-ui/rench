@@ -7,3 +7,11 @@ let dirname = s => {
 let normalize = s => {
   Fpath.v(s) |> Fpath.to_string;
 };
+
+let filename = s => {
+  Fpath.v(s) |> Fpath.filename;
+};
+
+let extname = s => {
+  Fpath.v(s) |> Fpath.get_ext;
+};

@@ -11,7 +11,7 @@
     ]
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "esy x TestRunner.exe"
   },
   "repository": {
     "type": "git",
@@ -34,8 +34,6 @@
     "@reason-native/rely": "*"
   },
   "resolutions": {
-    "@esy-ocaml/reason": "facebook/reason#ab49908",
-    "@opam/menhir": "20171013",
     "@opam/re": "1.7.3"
   },
   "devDependencies": {

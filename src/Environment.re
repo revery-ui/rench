@@ -31,9 +31,9 @@ let getEnvironmentVariable = (name: string) => {
 };
 
 let getWorkingDirectory = () => {
-    Sys.getcwd();
+  Sys.getcwd();
 };
 
 let getExecutingDirectory = () => {
-    Filename.dirname(Sys.argv[0]);
+  Filename.dirname(Sys.argv[0]);
 };

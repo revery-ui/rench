@@ -28,16 +28,16 @@ describe("Environment", ({describe, _}) => {
       };
     })
   );
-  describe("getExecutingDirectory", ({test, _}) => {
+  describe("getExecutingDirectory", ({test, _}) =>
     test("returns correct path", ({expect}) => {
       let testRunnerPath = Environment.which("TestRunner.exe");
       switch (testRunnerPath) {
       | Some(v) =>
-          let expected = Path.dirname(v);
-          let xd = Environment.getExecutingDirectory();     
-          expect.string(expected).toEqual(xd);
-      | None => expect.bool(true).toBeFalse();
+        let expected = Path.dirname(v);
+        let xd = Environment.getExecutingDirectory();
+        expect.string(expected).toEqual(xd);
+      | None => expect.bool(true).toBeFalse()
       };
-    });
-  });
+    })
+  );
 });
