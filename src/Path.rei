@@ -17,3 +17,5 @@ let extname: string => string;
 let filename: string => string;
 
 let normalize: string => string;
+
+let join: (string, string) => string;

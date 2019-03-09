@@ -15,3 +15,9 @@ let filename = s => {
 let extname = s => {
   Fpath.v(s) |> Fpath.get_ext;
 };
+
+let join = (p1, p2) => {
+  let p1 = Fpath.v(p1) |> Fpath.normalize;
+  let p2 = Fpath.v(p2) |> Fpath.normalize;
+  Fpath.append(p1, p2) |> Fpath.normalize |> Fpath.to_string;
+};

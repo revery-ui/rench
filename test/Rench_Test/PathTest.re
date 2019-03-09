@@ -8,6 +8,50 @@ let testIfWindows = (test, s, f) =>
   };
 
 describe("Path", ({describe, _}) => {
+  describe("join", ({test, _}) =>
+    if (Sys.win32) {
+      test("forward slash path", ({expect}) => {
+        let p1 = "C:\\test1\\test2";
+        let p2 = ".\\test3\\test4.json";
+        expect.string(Path.join(p1, p2)).toEqual(
+          "C:\\test1\\test2\\test3\\test4.json",
+        );
+      });
+
+      test("backslash path", ({expect}) => {
+        let p1 = "C:/test1/test2";
+        let p2 = "./test3/test4.json";
+        expect.string(Path.join(p1, p2)).toEqual(
+          "C:\\test1\\test2\\test3\\test4.json",
+        );
+      });
+
+      test("relative path", ({expect}) => {
+        let p1 = "test1/test2";
+        let p2 = "./test3/test4.json";
+        expect.string(Path.join(p1, p2)).toEqual(
+          "test1\\test2\\test3\\test4.json",
+        );
+      });
+    } else {
+      test("backslash path", ({expect}) => {
+        let p1 = "/test1/test2";
+        let p2 = "./test3/test4.json";
+        expect.string(Path.join(p1, p2)).toEqual(
+          "/test1/test2/test3/test4.json",
+        );
+      });
+
+      test("relative path", ({expect}) => {
+        let p1 = "test1/test2";
+        let p2 = "./test3/test4.json";
+        expect.string(Path.join(p1, p2)).toEqual(
+          "test1/test2/test3/test4.json",
+        );
+      });
+    }
+  );
+
   describe("basename", ({test, _}) => {
     if (Sys.win32) {
       test("basic test case - Win32 forward slash", ({expect}) => {
