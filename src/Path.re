@@ -9,9 +9,9 @@ let normalize = s => {
 };
 
 let filename = s => {
-  Fpath.v(s) |> Fpath.filename;   
+  Fpath.v(s) |> Fpath.filename;
 };
 
 let extname = s => {
-  Fpath.v(s) |> Fpath.get_ext;   
+  Fpath.v(s) |> Fpath.get_ext;
 };
