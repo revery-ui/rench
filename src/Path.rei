@@ -13,4 +13,8 @@ let pathSeparator: string;
 
 let dirname: string => string;
 
+let extname: string => string;
+
+let filename: string => string;
+
 let normalize: string => string;
