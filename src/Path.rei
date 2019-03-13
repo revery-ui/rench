@@ -18,4 +18,6 @@ let filename: string => string;
 
 let normalize: string => string;
 
+let isAbsolute: string => bool;
+
 let join: (string, string) => string;
