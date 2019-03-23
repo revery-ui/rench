@@ -62,7 +62,7 @@ describe("ChildProcess", ({test, describe, _}) => {
 
     let formattedData = Str.split(Str.regexp("\n"), data^)
 
-    /* Check that we got _some_ version */
+    /* Check we got the expected error message */
     expect.list(formattedData).toEqual(expectedOutput);
 
     switch (proc.exitCode^) {
