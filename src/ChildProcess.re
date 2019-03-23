@@ -4,10 +4,12 @@ type innerProcess = {
   pid: int,
   stdout: outputPipe,
   stdin: inputPipe,
+  stderr: outputPipe,
   onClose: Event.t(int),
   exitCode: ref(option(int)),
   _readThread: Thread.t,
   _waitThread: Thread.t,
+  _errThread: Thread.t,
 };
 
 let _formatEnvironmentVariables = (env: EnvironmentVariables.t) => {
@@ -36,46 +38,9 @@ let _withWorkingDirectory = (wd: option(string), f) => {
   ret;
 };
 
-let _spawn =
-    (
-      cmd: string,
-      args: array(string),
-      env: EnvironmentVariables.t,
-      cwd: option(string),
-    ) => {
-  let (pstdin, stdin) = Unix.pipe();
-  let (stdout, pstdout) = Unix.pipe();
-
-  Unix.set_close_on_exec(pstdin);
-  Unix.set_close_on_exec(stdin);
-  Unix.set_close_on_exec(pstdout);
-  Unix.set_close_on_exec(stdout);
-
-  let formattedEnv = _formatEnvironmentVariables(env);
-
-  let pid =
-    _withWorkingDirectory(cwd, () =>
-      Unix.create_process_env(
-        cmd,
-        Array.append([|cmd|], args),
-        formattedEnv,
-        pstdin,
-        pstdout,
-        Unix.stderr,
-      )
-    );
-
-  Unix.close(pstdout);
-  Unix.close(pstdin);
-
-  let stdout_onData = Event.create();
-  let onClose = Event.create();
-
-  let isRunning = ref(true);
-
-  let readThread =
+let createReadingThread = (pipe, pipe_onData, isRunning) =>
     Thread.create(
-      ((stdout, stdout_onData)) => {
+      ((pipe, pipe_onData)) => {
         let buffer = Buffer.create(8192);
         let bytes = Bytes.create(8192);
 
@@ -84,13 +49,13 @@ let _spawn =
         let flush = () => {
           let out = Buffer.to_bytes(buffer);
           Buffer.clear(buffer);
-          Event.dispatch(stdout_onData, out);
+          Event.dispatch(pipe_onData, out);
         };
 
         while (isReading^) {
-          let ready = Thread.wait_timed_read(stdout, 0.01);
+          let ready = Thread.wait_timed_read(pipe, 0.01);
           if (ready) {
-            let n = Unix.read(stdout, bytes, 0, 8192);
+            let n = Unix.read(pipe, bytes, 0, 8192);
 
             if (n > 0) {
               let sub = Bytes.sub(bytes, 0, n);
@@ -108,8 +73,53 @@ let _spawn =
           };
         };
       },
-      (stdout, stdout_onData),
+      (pipe, pipe_onData),
     );
+
+let _spawn =
+    (
+      cmd: string,
+      args: array(string),
+      env: EnvironmentVariables.t,
+      cwd: option(string),
+    ) => {
+  let (pstdin, stdin) = Unix.pipe();
+  let (stdout, pstdout) = Unix.pipe();
+  let (stderr, pstderr) = Unix.pipe();
+
+  Unix.set_close_on_exec(pstdin);
+  Unix.set_close_on_exec(stdin);
+  Unix.set_close_on_exec(pstdout);
+  Unix.set_close_on_exec(stdout);
+  Unix.set_close_on_exec(pstderr);
+  Unix.set_close_on_exec(stderr);
+
+  let formattedEnv = _formatEnvironmentVariables(env);
+
+  let pid =
+    _withWorkingDirectory(cwd, () =>
+      Unix.create_process_env(
+        cmd,
+        Array.append([|cmd|], args),
+        formattedEnv,
+        pstdin,
+        pstdout,
+        pstderr
+      )
+    );
+
+  Unix.close(pstdout);
+  Unix.close(pstdin);
+  Unix.close(pstderr);
+
+  let stdout_onData = Event.create();
+  let stderr_onData = Event.create();
+  let onClose = Event.create();
+
+  let isRunning = ref(true);
+
+  let readThread = createReadingThread(stdout, stdout_onData, isRunning);
+  let errThread = createReadingThread(stderr, stderr_onData, isRunning);
 
   let _dispose = exitCode => {
     isRunning := false;
@@ -133,6 +143,7 @@ let _spawn =
     );
 
   let retStdout: outputPipe = {onData: stdout_onData};
+  let retStderr: outputPipe = {onData: stderr_onData};
 
   let stdinClose = () => {
     Unix.close(stdin);
@@ -149,10 +160,12 @@ let _spawn =
     pid,
     stdin: retStdin,
     stdout: retStdout,
+    stderr: retStderr,
     onClose,
     exitCode: ref(None),
     _waitThread: waitThread,
     _readThread: readThread,
+    _errThread: errThread,
   };
 
   let _ = Event.subscribe(onClose, code => ret.exitCode := Some(code));
@@ -167,10 +180,10 @@ let spawn =
       cmd: string,
       args: array(string),
     ) => {
-  let {pid, stdin, stdout, onClose, exitCode, _} =
+  let {pid, stdin, stdout, stderr, onClose, exitCode, _} =
     _spawn(cmd, args, env, cwd);
 
-  let ret: process = {pid, stdin, stdout, onClose, exitCode};
+  let ret: process = {pid, stdin, stdout, stderr, onClose, exitCode};
   ret;
 };
 
@@ -184,10 +197,16 @@ let spawnSync =
     ) => {
   let innerProc = _spawn(cmd, args, env, cwd);
 
-  let output = ref("");
-  let unsubscribe =
+  let outOutput = ref("");
+  let errOutput = ref("");
+  let outUnsubscribe =
     Event.subscribe(innerProc.stdout.onData, data =>
-      output := output^ ++ Bytes.to_string(data)
+      outOutput := outOutput^ ++ Bytes.to_string(data)
+    );
+
+  let errUnsubscribe =
+    Event.subscribe(innerProc.stderr.onData, data =>
+      errOutput := errOutput^ ++ Bytes.to_string(data)
     );
 
   switch (opts.input) {
@@ -199,7 +218,9 @@ let spawnSync =
 
   Thread.join(innerProc._waitThread);
   Thread.join(innerProc._readThread);
-  unsubscribe();
+  Thread.join(innerProc._errThread);
+  outUnsubscribe();
+  errUnsubscribe();
 
   let exitCode =
     switch (innerProc.exitCode^) {
@@ -207,6 +228,6 @@ let spawnSync =
     | None => (-1)
     };
 
-  let ret: processSync = {pid: innerProc.pid, stdout: output^, exitCode};
+  let ret: processSync = {pid: innerProc.pid, stdout: outOutput^, stderr: errOutput^, exitCode};
   ret;
 };
