@@ -13,8 +13,8 @@ value rench_pid(value handle) {
 
 #ifdef _WIN32
     HANDLE hnd = (HANDLE)Long_val(handle);
-    CAMLreturn(Val_int(GetProcessId(hdn));
+    CAMLreturn(Val_int(GetProcessId(hnd)));
 #else
-    CAMLreturn(handle);)    
+    CAMLreturn(handle);    
 #endif
 }
