@@ -11,7 +11,8 @@
     ]
   },
   "scripts": {
-    "test": "esy x TestRunner.exe"
+    "test": "esy x TestRunner.exe",
+    "format": "esy dune build @fmt --auto-promote"
   },
   "repository": {
     "type": "git",

@@ -6,6 +6,7 @@ type innerProcess = {
   stdin: inputPipe,
   onClose: Event.t(int),
   exitCode: ref(option(int)),
+  kill: int => unit,
   _readThread: Thread.t,
   _waitThread: Thread.t,
 };
@@ -145,12 +146,22 @@ let _spawn =
 
   let retStdin: inputPipe = {write: stdinWrite, close: stdinClose};
 
+  let kill = sig_ => {
+    let signalToUse =
+      Sys.win32
+        ? Sys.sigkill  /* Sigkill is the only signal supported on Win by the Unix module */
+        : sig_;
+
+    Unix.kill(pid, signalToUse);
+  };
+
   let ret: innerProcess = {
     pid,
     stdin: retStdin,
     stdout: retStdout,
     onClose,
     exitCode: ref(None),
+    kill,
     _waitThread: waitThread,
     _readThread: readThread,
   };
@@ -167,10 +178,10 @@ let spawn =
       cmd: string,
       args: array(string),
     ) => {
-  let {pid, stdin, stdout, onClose, exitCode, _} =
+  let {pid, kill, stdin, stdout, onClose, exitCode, _} =
     _spawn(cmd, args, env, cwd);
 
-  let ret: process = {pid, stdin, stdout, onClose, exitCode};
+  let ret: process = {pid, kill, stdin, stdout, onClose, exitCode};
   ret;
 };
 
