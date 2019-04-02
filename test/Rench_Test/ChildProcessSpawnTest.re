@@ -57,8 +57,13 @@ describe("ChildProcess", ({describe, _}) => {
 
       waitForProcessExit(proc);
 
+      let expectedSignal = switch(Sys.win32) {
+      | true => 0
+      | false => Sys.sigkill
+      };
+
       switch (proc.exitCode^) {
-      | Some(v) => expect.int(v).toBe(0)
+      | Some(v) => expect.int(v).toBe(expectedSignal)
       | None => expect.string("Failed").toEqual("process did not close")
       };
     });
