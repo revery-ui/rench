@@ -24,45 +24,44 @@ let waitForProcessExit = (proc: ChildProcess.process) => {
 
 describe("ChildProcess", ({describe, _}) => {
   describe("spawn", ({test, _}) => {
-    
-      test("sends output", ({expect}) => {
-        let script = {|
+    test("sends output", ({expect}) => {
+      let script = {|
             console.log('v1000');
         |};
-        let proc = ChildProcess.spawn("node", [|"-e", script|]);
+      let proc = ChildProcess.spawn("node", [|"-e", script|]);
 
-        let data = ref("");
-        let _ =
-          Event.subscribe(proc.stdout.onData, str =>
-            data := data^ ++ Bytes.to_string(str)
-          );
+      let data = ref("");
+      let _ =
+        Event.subscribe(proc.stdout.onData, str =>
+          data := data^ ++ Bytes.to_string(str)
+        );
 
-        waitForProcessExit(proc);
+      waitForProcessExit(proc);
 
-        /* Check that we got _some_ version */
-        expect.string(data^).toEqual("v1000\n");
+      /* Check that we got _some_ version */
+      expect.string(data^).toEqual("v1000\n");
 
-        switch (proc.exitCode^) {
-        | Some(x) => expect.int(x).toBe(0)
-        | _ => ()
-        };
-      });
+      switch (proc.exitCode^) {
+      | Some(x) => expect.int(x).toBe(0)
+      | _ => ()
+      };
+    });
 
-      test("kill process", ({expect}) => {
-        let script = {|
+    test("kill process", ({expect}) => {
+      let script = {|
             while(true) { };
         |};
-        let proc = ChildProcess.spawn("node", [|"-e", script|]);
+      let proc = ChildProcess.spawn("node", [|"-e", script|]);
 
-        proc.kill(Sys.sigkill);
+      proc.kill(Sys.sigkill);
 
-        waitForProcessExit(proc);
+      waitForProcessExit(proc);
 
-        switch (proc.exitCode^) {
-        | Some(v) => expect.int(v).toBe(0)
-        | None => expect.string("Failed").toEqual("process did not close");
-        }
-      });
+      switch (proc.exitCode^) {
+      | Some(v) => expect.int(v).toBe(0)
+      | None => expect.string("Failed").toEqual("process did not close")
+      };
+    });
   });
 
   describe("spawnSync", ({test, _}) => {

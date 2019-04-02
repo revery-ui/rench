@@ -52,25 +52,25 @@ describe("Path", ({describe, _}) => {
     }
   );
 
-  describe("isAbsolute", ({test, _}) => {
-      if (Sys.win32) {
-        test("win32 - root path", ({expect}) => {
-          expect.bool(Path.isAbsolute("D:/test.txt")).toBe(true);  
-        });
+  describe("isAbsolute", ({test, _}) =>
+    if (Sys.win32) {
+      test("win32 - root path", ({expect}) =>
+        expect.bool(Path.isAbsolute("D:/test.txt")).toBe(true)
+      );
 
-        test("win32 - relative path", ({expect}) => {
-          expect.bool(Path.isAbsolute("test/test.txt")).toBe(false);  
-        });
-      } else {
-        test("root path", ({expect}) => {
-          expect.bool(Path.isAbsolute("/test.txt")).toBe(true);  
-        });
+      test("win32 - relative path", ({expect}) =>
+        expect.bool(Path.isAbsolute("test/test.txt")).toBe(false)
+      );
+    } else {
+      test("root path", ({expect}) =>
+        expect.bool(Path.isAbsolute("/test.txt")).toBe(true)
+      );
 
-        test("relative path", ({expect}) => {
-          expect.bool(Path.isAbsolute("test/test.txt")).toBe(false);  
-        });
-      }
-  });
+      test("relative path", ({expect}) =>
+        expect.bool(Path.isAbsolute("test/test.txt")).toBe(false)
+      );
+    }
+  );
 
   describe("basename", ({test, _}) => {
     if (Sys.win32) {
