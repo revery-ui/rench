@@ -57,10 +57,7 @@ describe("ChildProcess", ({describe, _}) => {
 
       waitForProcessExit(proc);
 
-      let expectedSignal = switch(Sys.win32) {
-      | true => 0
-      | false => Sys.sigkill
-      };
+      let expectedSignal = Sys.win32 ? 0 : Sys.sigkill;
 
       switch (proc.exitCode^) {
       | Some(v) => expect.int(v).toBe(expectedSignal)
