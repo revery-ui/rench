@@ -65,7 +65,7 @@ describe("ChildProcess", ({describe, _}) => {
       };
     });
 
-    test("kill process, after closed", ({expect}) => {
+    test("kill process, after already closed", ({expect}) => {
       let script = {|
             console.log('yo');
         |};
@@ -75,10 +75,8 @@ describe("ChildProcess", ({describe, _}) => {
 
       proc.kill(Sys.sigkill);
 
-      let expectedSignal = Sys.win32 ? 0 : Sys.sigkill;
-
       switch (proc.exitCode^) {
-      | Some(v) => expect.int(v).toBe(expectedSignal)
+      | Some(v) => expect.int(v).toBe(0)
       | None => expect.string("Failed").toEqual("process did not close")
       };
     });

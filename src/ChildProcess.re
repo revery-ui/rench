@@ -147,12 +147,14 @@ let _spawn =
   let retStdin: inputPipe = {write: stdinWrite, close: stdinClose};
 
   let kill = sig_ => {
+    if (isRunning^) {
     let signalToUse =
       Sys.win32
         ? Sys.sigkill  /* Sigkill is the only signal supported on Win by the Unix module */
         : sig_;
 
     Unix.kill(pid, signalToUse);
+    };
   };
 
   let ret: innerProcess = {
