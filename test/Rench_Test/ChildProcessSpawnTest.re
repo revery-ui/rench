@@ -64,6 +64,24 @@ describe("ChildProcess", ({describe, _}) => {
       | None => expect.string("Failed").toEqual("process did not close")
       };
     });
+
+    test("kill process, after closed", ({expect}) => {
+      let script = {|
+            console.log('yo');
+        |};
+      let proc = ChildProcess.spawn("node", [|"-e", script|]);
+
+      waitForProcessExit(proc);
+
+      proc.kill(Sys.sigkill);
+
+      let expectedSignal = Sys.win32 ? 0 : Sys.sigkill;
+
+      switch (proc.exitCode^) {
+      | Some(v) => expect.int(v).toBe(expectedSignal)
+      | None => expect.string("Failed").toEqual("process did not close")
+      };
+    });
   });
 
   describe("spawnSync", ({test, _}) => {
