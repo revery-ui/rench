@@ -151,8 +151,15 @@ let _spawn =
   };
 
   let stdinWrite = bytes => {
-    let _ = Unix.write(stdin, bytes, 0, Bytes.length(bytes));
-    ();
+    switch(
+    Unix.write(stdin, bytes, 0, Bytes.length(bytes))
+    ) {
+    /* A write may fail expectedly if the process was closed internally.
+       In that case, the write channel will be invalid prior to us
+       getting a close event - so we should just ignore it. */
+    | exception Unix.Unix_error(_) => ()
+    | _ => ()
+    }
   };
 
   let retStdin: inputPipe = {write: stdinWrite, close: stdinClose};
@@ -180,7 +187,10 @@ let _spawn =
     _errThread: errThread,
   };
 
-  let _ = Event.subscribe(onClose, code => ret.exitCode := Some(code));
+  let _ = Event.subscribe(onClose, code => {
+      prerr_endline ("RENCH: ONCLOSE");
+      ret.exitCode := Some(code);
+  });
 
   ret;
 };
