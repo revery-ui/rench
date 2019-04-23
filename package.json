@@ -1,6 +1,6 @@
 {
   "name": "rench",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "description": "Reason Native Cross-platform Helpers - a Node-inspired API for Reason",
   "main": "index.js",
   "esy": {
