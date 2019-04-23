@@ -151,8 +151,13 @@ let _spawn =
   };
 
   let stdinWrite = bytes => {
-    let _ = Unix.write(stdin, bytes, 0, Bytes.length(bytes));
-    ();
+    switch (Unix.write(stdin, bytes, 0, Bytes.length(bytes))) {
+    /* A write may fail expectedly if the process was closed internally.
+       In that case, the write channel will be invalid prior to us
+       getting a close event - so we should just ignore it. */
+    | exception (Unix.Unix_error(_)) => ()
+    | _ => ()
+    };
   };
 
   let retStdin: inputPipe = {write: stdinWrite, close: stdinClose};
