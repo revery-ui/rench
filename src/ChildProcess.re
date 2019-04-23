@@ -40,42 +40,42 @@ let _withWorkingDirectory = (wd: option(string), f) => {
 };
 
 let createReadingThread = (pipe, pipe_onData, isRunning) =>
-    Thread.create(
-      ((pipe, pipe_onData)) => {
-        let buffer = Buffer.create(8192);
-        let bytes = Bytes.create(8192);
+  Thread.create(
+    ((pipe, pipe_onData)) => {
+      let buffer = Buffer.create(8192);
+      let bytes = Bytes.create(8192);
 
-        let isReading = ref(true);
+      let isReading = ref(true);
 
-        let flush = () => {
-          let out = Buffer.to_bytes(buffer);
-          Buffer.clear(buffer);
-          Event.dispatch(pipe_onData, out);
-        };
+      let flush = () => {
+        let out = Buffer.to_bytes(buffer);
+        Buffer.clear(buffer);
+        Event.dispatch(pipe_onData, out);
+      };
 
-        while (isReading^) {
-          let ready = Thread.wait_timed_read(pipe, 0.01);
-          if (ready) {
-            let n = Unix.read(pipe, bytes, 0, 8192);
+      while (isReading^) {
+        let ready = Thread.wait_timed_read(pipe, 0.01);
+        if (ready) {
+          let n = Unix.read(pipe, bytes, 0, 8192);
 
-            if (n > 0) {
-              let sub = Bytes.sub(bytes, 0, n);
-              Buffer.add_bytes(buffer, sub);
+          if (n > 0) {
+            let sub = Bytes.sub(bytes, 0, n);
+            Buffer.add_bytes(buffer, sub);
 
-              if (n < 8192) {
-                flush();
-              };
-            } else if (! isRunning^) {
-              if (Buffer.length(buffer) > 0) {
-                flush();
-              };
-              isReading := false;
+            if (n < 8192) {
+              flush();
             };
+          } else if (! isRunning^) {
+            if (Buffer.length(buffer) > 0) {
+              flush();
+            };
+            isReading := false;
           };
         };
-      },
-      (pipe, pipe_onData),
-    );
+      };
+    },
+    (pipe, pipe_onData),
+  );
 
 let _spawn =
     (
@@ -105,7 +105,7 @@ let _spawn =
         formattedEnv,
         pstdin,
         pstdout,
-        pstderr
+        pstderr,
       )
     );
 
@@ -240,6 +240,11 @@ let spawnSync =
     | None => (-1)
     };
 
-  let ret: processSync = {pid: innerProc.pid, stdout: outOutput^, stderr: errOutput^, exitCode};
+  let ret: processSync = {
+    pid: innerProc.pid,
+    stdout: outOutput^,
+    stderr: errOutput^,
+    exitCode,
+  };
   ret;
 };
