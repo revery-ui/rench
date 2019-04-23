@@ -12,6 +12,7 @@ type process = {
   pid: int,
   stdout: outputPipe,
   stdin: inputPipe,
+  stderr: outputPipe,
   onClose: Event.t(int),
   exitCode: ref(option(int)),
   kill: int => unit,
@@ -21,6 +22,7 @@ type processSync = {
   pid: int,
   exitCode: int,
   stdout: string,
+  stderr: string,
 };
 
 module SpawnSyncOptions = {

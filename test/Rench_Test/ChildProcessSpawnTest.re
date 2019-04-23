@@ -82,6 +82,24 @@ describe("ChildProcess", ({describe, _}) => {
     });
   });
 
+  describe("stderr", ({test, _}) =>
+    test("spawn with output to stderr", ({expect}) => {
+      let script = {|
+            console.error('error output');
+        |};
+      let proc = ChildProcess.spawn("node", [|"-e", script|]);
+
+      let data = ref("");
+      let _ =
+        Event.subscribe(proc.stderr.onData, str =>
+          data := data^ ++ Bytes.to_string(str)
+        );
+
+      waitForProcessExit(proc);
+      expect.string(data^).toEqual("error output\n");
+    })
+  );
+
   describe("spawnSync", ({test, _}) => {
     test("process creation", ({expect}) => {
       let script = {|
