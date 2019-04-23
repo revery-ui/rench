@@ -15,6 +15,7 @@ type process = {
   stderr: outputPipe,
   onClose: Event.t(int),
   exitCode: ref(option(int)),
+  kill: int => unit,
 };
 
 type processSync = {

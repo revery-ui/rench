@@ -1,6 +1,6 @@
 {
   "name": "rench",
-  "version": "1.4.0",
+  "version": "1.6.1",
   "description": "Reason Native Cross-platform Helpers - a Node-inspired API for Reason",
   "main": "index.js",
   "esy": {
@@ -11,7 +11,8 @@
     ]
   },
   "scripts": {
-    "test": "esy x TestRunner.exe"
+    "test": "esy x TestRunner.exe",
+    "format": "esy dune build @fmt --auto-promote"
   },
   "repository": {
     "type": "git",
