@@ -185,14 +185,7 @@ let _spawn =
     _errThread: errThread,
   };
 
-  let _ =
-    Event.subscribe(
-      onClose,
-      code => {
-        prerr_endline("RENCH: ONCLOSE");
-        ret.exitCode := Some(code);
-      },
-    );
+  let _ = Event.subscribe(onClose, code => ret.exitCode := Some(code));
 
   ret;
 };
