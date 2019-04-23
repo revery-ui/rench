@@ -1,5 +1,18 @@
 include ChildProcessTypes;
 
+type inputFunction = Bytes.t => unit;
+type closeFunction = int => unit;
+
+type pid = int;
+type exitCode = int;
+
+type outputPipe = {onData: Event.t(Bytes.t)};
+type writeFunction = Bytes.t => unit;
+
+type inputPipe = {
+  write: writeFunction,
+};
+
 type innerProcess = {
   pid: int,
   stdout: outputPipe,
@@ -135,16 +148,16 @@ let _spawn =
 
   let retStdout: outputPipe = {onData: stdout_onData};
 
-  let stdinClose = () => {
-    Unix.close(stdin);
-  };
+  /* let stdinClose = () => { */
+  /*   Unix.close(stdin); */
+  /* }; */
 
   let stdinWrite = bytes => {
     let _ = Unix.write(stdin, bytes, 0, Bytes.length(bytes));
     ();
   };
 
-  let retStdin: inputPipe = {write: stdinWrite, close: stdinClose};
+  let retStdin: inputPipe = {write: stdinWrite};
 
   let kill = sig_ =>
     if (isRunning^) {
@@ -176,14 +189,25 @@ let spawn =
     (
       ~cwd=None,
       ~env=EnvironmentUtility.getEnvironmentVariables(),
+      ~onStdout,
+      ~onClose as closeHandler,
       cmd: string,
       args: array(string),
     ) => {
-  let {pid, kill, stdin, stdout, onClose, exitCode, _} =
+  let {pid, kill, stdin, stdout, onClose, _} =
     _spawn(cmd, args, env, cwd);
 
-  let ret: process = {pid, kill, stdin, stdout, onClose, exitCode};
-  ret;
+  let disposables = ref([]);
+
+  let disposable1 = Event.subscribe(stdout.onData, onStdout);
+  let disposable2 = Event.subscribe(onClose, (code) => {
+      List.iter(d => d(), disposables^);
+      closeHandler(code);
+  });
+
+  disposables := [disposable1, disposable2];
+
+  (pid, stdin.write, kill);
 };
 
 let spawnSync =
@@ -219,6 +243,5 @@ let spawnSync =
     | None => (-1)
     };
 
-  let ret: processSync = {pid: innerProc.pid, stdout: output^, exitCode};
-  ret;
+  (innerProc.pid, exitCode, output^);
 };

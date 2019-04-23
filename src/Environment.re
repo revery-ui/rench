@@ -6,12 +6,12 @@ let which = (executableName: string) => {
   /* TODO: An alternative implementation would be to go through the PATH */
   let whichCommand = Sys.win32 ? "where" : "which";
 
-  let proc = ChildProcess.spawnSync(whichCommand, [|executableName|]);
+  let (_, exitCode, stdout, _) = ChildProcess.spawnSync(whichCommand, [|executableName|]);
 
-  switch (proc.exitCode) {
+  switch (exitCode) {
   | 0 =>
     let v =
-      proc.stdout
+      stdout
       |> String.trim
       |> String.split_on_char('\n')
       |> List.hd
