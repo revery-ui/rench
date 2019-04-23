@@ -82,31 +82,22 @@ describe("ChildProcess", ({describe, _}) => {
     });
   });
 
-  test("spawn with output to stderr", ({expect}) => {
-    /* Some invalid command that outputs to stderr */
-    let proc = ChildProcess.spawn("ls", [|"-?"|]);
-    let expectedOutput = [
-      "ls: invalid option -- '?'",
-      "Try 'ls --help' for more information."
-    ]
+  describe("stderr", ({test, _}) => {
+      test("spawn with output to stderr", ({expect}) => {
+        let script = {|
+            console.error('error output');
+        |};
+        let proc = ChildProcess.spawn("node", [|"-e", script|]);
 
-    let data = ref("");
-    let _ =
-      Event.subscribe(proc.stderr.onData, str =>
-        data := data^ ++ Bytes.to_string(str)
-      );
+        let data = ref("");
+        let _ =
+          Event.subscribe(proc.stderr.onData, str =>
+            data := data^ ++ Bytes.to_string(str)
+          );
 
-    waitForProcessExit(proc);
-
-    let formattedData = Str.split(Str.regexp("\n"), data^)
-
-    /* Check we got the expected error message */
-    expect.list(formattedData).toEqual(expectedOutput);
-
-    switch (proc.exitCode^) {
-    | Some(x) => expect.notEqual(0, x) /* Should have errored */
-    | _ => ()
-    };
+        waitForProcessExit(proc);
+        expect.string(data^).toEqual("error output\n");
+      });
   });
 
   describe("spawnSync", ({test, _}) => {
