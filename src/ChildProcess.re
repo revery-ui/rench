@@ -169,6 +169,10 @@ let _spawn =
           ? Sys.sigkill  /* Sigkill is the only signal supported on Win by the Unix module */
           : sig_;
 
+      Unix.close(stdin);
+      Unix.close(stdout);
+      Unix.close(stderr);
+
       /* In some cases, we get a Unix_error(Unix.ESRCH, "kill") exception thrown */
       /* For now - just ignore. Is there a case where the consumer needs to know / handle this? */
       switch (Unix.kill(pid, signalToUse)) {
