@@ -21,6 +21,14 @@ let _formatEnvironmentVariables = (env: EnvironmentVariables.t) => {
   EnvironmentVariables.fold(~f, env, [||]);
 };
 
+let _safeClose = (v) => {
+    switch (Unix.close(v)) {
+    /* We may get a BADF if this is called too soon after opening a process */
+    | exception (Unix.Unix_error(_)) => ()
+    | _ => ()
+    };
+}
+
 let _withWorkingDirectory = (wd: option(string), f) => {
   let currentDirectory = Sys.getcwd();
 
@@ -125,6 +133,11 @@ let _spawn =
   let _dispose = exitCode => {
     isRunning := false;
     Event.dispatch(onClose, exitCode);
+
+    _safeClose(stdout);
+    _safeClose(stdin);
+    _safeClose(stderr);
+    Gc.full_major();
   };
 
   let waitThread =
@@ -169,9 +182,9 @@ let _spawn =
           ? Sys.sigkill  /* Sigkill is the only signal supported on Win by the Unix module */
           : sig_;
 
-      Unix.close(stdin);
-      Unix.close(stdout);
-      Unix.close(stderr);
+      _safeClose(stdin);
+      _safeClose(stdout);
+      _safeClose(stderr);
 
       /* In some cases, we get a Unix_error(Unix.ESRCH, "kill") exception thrown */
       /* For now - just ignore. Is there a case where the consumer needs to know / handle this? */
