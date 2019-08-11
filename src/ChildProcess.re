@@ -162,7 +162,7 @@ let _spawn =
 
   let retStdin: inputPipe = {write: stdinWrite, close: stdinClose};
 
-  let kill = sig_ => {
+  let kill = sig_ =>
     if (isRunning^) {
       let signalToUse =
         Sys.win32
@@ -171,12 +171,11 @@ let _spawn =
 
       /* In some cases, we get a Unix_error(Unix.ESRCH, "kill") exception thrown */
       /* For now - just ignore. Is there a case where the consumer needs to know / handle this? */
-      switch(Unix.kill(pid, signalToUse)) {
+      switch (Unix.kill(pid, signalToUse)) {
       | exception (Unix.Unix_error(_)) => ()
       | _ => ()
       };
-    }
-  };
+    };
 
   let ret: innerProcess = {
     pid,
