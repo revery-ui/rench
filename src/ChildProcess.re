@@ -21,13 +21,13 @@ let _formatEnvironmentVariables = (env: EnvironmentVariables.t) => {
   EnvironmentVariables.fold(~f, env, [||]);
 };
 
-let _safeClose = (v) => {
-    switch (Unix.close(v)) {
-    /* We may get a BADF if this is called too soon after opening a process */
-    | exception (Unix.Unix_error(_)) => ()
-    | _ => ()
-    };
-}
+let _safeClose = v => {
+  switch (Unix.close(v)) {
+  /* We may get a BADF if this is called too soon after opening a process */
+  | exception (Unix.Unix_error(_)) => ()
+  | _ => ()
+  };
+};
 
 let _withWorkingDirectory = (wd: option(string), f) => {
   let currentDirectory = Sys.getcwd();
@@ -62,7 +62,13 @@ let createReadingThread = (pipe, pipe_onData, isRunning) =>
       };
 
       while (isReading^) {
-        let ready = Thread.wait_timed_read(pipe, 0.01);
+        let ready =
+          switch (Thread.wait_timed_read(pipe, 0.01)) {
+          | exception _ =>
+            isReading := false;
+            false;
+          | v => v
+          };
         if (ready) {
           let n = Unix.read(pipe, bytes, 0, 8192);
 
