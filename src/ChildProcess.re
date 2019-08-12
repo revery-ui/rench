@@ -70,7 +70,13 @@ let createReadingThread = (pipe, pipe_onData, isRunning) =>
           | v => v
           };
         if (ready) {
-          let n = Unix.read(pipe, bytes, 0, 8192);
+          let n =
+            switch (Unix.read(pipe, bytes, 0, 8192)) {
+            | exception _ =>
+              isReading := false;
+              0;
+            | v => v
+            };
 
           if (n > 0) {
             let sub = Bytes.sub(bytes, 0, n);
