@@ -146,9 +146,15 @@ let _spawn =
     isRunning := false;
     Event.dispatch(onClose, exitCode);
 
-    _safeClose(stdout);
-    _safeClose(stdin);
-    _safeClose(stderr);
+    // On Windows, closing these here can prevent the output from flushing completely.
+    // This closing is being done to prevent file descriptors from leaking, which
+    // doesn't appear to be an issue on Windows.
+    if (!Sys.win32) {
+      _safeClose(stdout);
+      _safeClose(stdin);
+      _safeClose(stderr);
+    }
+    
     Gc.full_major();
   };
 
