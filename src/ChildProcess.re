@@ -21,6 +21,14 @@ let _formatEnvironmentVariables = (env: EnvironmentVariables.t) => {
   EnvironmentVariables.fold(~f, env, [||]);
 };
 
+let _safeClose = v => {
+  switch (Unix.close(v)) {
+  /* We may get a BADF if this is called too soon after opening a process */
+  | exception (Unix.Unix_error(_)) => ()
+  | _ => ()
+  };
+};
+
 let _withWorkingDirectory = (wd: option(string), f) => {
   let currentDirectory = Sys.getcwd();
 
@@ -54,9 +62,21 @@ let createReadingThread = (pipe, pipe_onData, isRunning) =>
       };
 
       while (isReading^) {
-        let ready = Thread.wait_timed_read(pipe, 0.01);
+        let ready =
+          switch (Thread.wait_timed_read(pipe, 0.01)) {
+          | exception _ =>
+            isReading := false;
+            false;
+          | v => v
+          };
         if (ready) {
-          let n = Unix.read(pipe, bytes, 0, 8192);
+          let n =
+            switch (Unix.read(pipe, bytes, 0, 8192)) {
+            | exception _ =>
+              isReading := false;
+              0;
+            | v => v
+            };
 
           if (n > 0) {
             let sub = Bytes.sub(bytes, 0, n);
@@ -125,6 +145,11 @@ let _spawn =
   let _dispose = exitCode => {
     isRunning := false;
     Event.dispatch(onClose, exitCode);
+
+    _safeClose(stdout);
+    _safeClose(stdin);
+    _safeClose(stderr);
+    Gc.full_major();
   };
 
   let waitThread =
@@ -169,7 +194,16 @@ let _spawn =
           ? Sys.sigkill  /* Sigkill is the only signal supported on Win by the Unix module */
           : sig_;
 
-      Unix.kill(pid, signalToUse);
+      _safeClose(stdin);
+      _safeClose(stdout);
+      _safeClose(stderr);
+
+      /* In some cases, we get a Unix_error(Unix.ESRCH, "kill") exception thrown */
+      /* For now - just ignore. Is there a case where the consumer needs to know / handle this? */
+      switch (Unix.kill(pid, signalToUse)) {
+      | exception (Unix.Unix_error(_)) => ()
+      | _ => ()
+      };
     };
 
   let ret: innerProcess = {
