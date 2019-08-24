@@ -93,6 +93,8 @@ let createReadingThread = (pipe, pipe_onData, isRunning) =>
           };
         };
       };
+
+      _safeClose(pipe);
     },
     (pipe, pipe_onData),
   );
@@ -145,10 +147,10 @@ let _spawn =
   let _dispose = exitCode => {
     isRunning := false;
     Event.dispatch(onClose, exitCode);
-
-    _safeClose(stdout);
     _safeClose(stdin);
-    _safeClose(stderr);
+
+    /*_safeClose(stdout);
+    _safeClose(stderr);*/
     Gc.full_major();
   };
 
