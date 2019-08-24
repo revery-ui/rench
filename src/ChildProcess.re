@@ -148,10 +148,6 @@ let _spawn =
     isRunning := false;
     Event.dispatch(onClose, exitCode);
     _safeClose(stdin);
-
-    /*_safeClose(stdout);
-    _safeClose(stderr);*/
-    Gc.full_major();
   };
 
   let waitThread =
