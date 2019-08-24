@@ -93,6 +93,8 @@ let createReadingThread = (pipe, pipe_onData, isRunning) =>
           };
         };
       };
+
+      _safeClose(pipe);
     },
     (pipe, pipe_onData),
   );
@@ -145,17 +147,7 @@ let _spawn =
   let _dispose = exitCode => {
     isRunning := false;
     Event.dispatch(onClose, exitCode);
-
-    // On Windows, closing these here can prevent the output from flushing completely.
-    // This closing is being done to prevent file descriptors from leaking, which
-    // doesn't appear to be an issue on Windows.
-    if (!Sys.win32) {
-      _safeClose(stdout);
-      _safeClose(stdin);
-      _safeClose(stderr);
-    }
-    
-    Gc.full_major();
+    _safeClose(stdin);
   };
 
   let waitThread =
