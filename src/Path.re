@@ -17,7 +17,18 @@ let extname = s => {
 };
 
 let isAbsolute = s => {
-  s |> Fpath.v |> |> Fpath.normalize |> Fpath.is_abs;
+
+  let isAbs = s |> Fpath.v |> |> Fpath.normalize |> Fpath.is_abs;
+
+  if (!Sys.win32) {
+    // Check for `~` at root. This is a case that should be recognized
+    // as an absolute path: https://unix.stackexchange.com/questions/221970/is-documents-a-relative-or-an-absolute-path
+    // but is not correctly handled.
+
+    isAbs || (String.length(s) > 0 && String.get(s, 0) == '~');
+  } else {
+    isAbs
+  }
 };
 
 let join = (p1, p2) => {
