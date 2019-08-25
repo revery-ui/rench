@@ -18,7 +18,7 @@ let extname = s => {
 
 let isAbsolute = s => {
 
-  let isAbs = s |> Fpath.v |> |> Fpath.normalize |> Fpath.is_abs;
+  let isAbs = s |> Fpath.v |> Fpath.normalize |> Fpath.is_abs;
 
   if (!Sys.win32) {
     // Check for `~` at root. This is a case that should be recognized
