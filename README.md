@@ -1,4 +1,4 @@
-[![Build Status](https://bryphe.visualstudio.com/rench/_apis/build/status/bryphe.rench?branchName=master)](https://bryphe.visualstudio.com/rench/_build/latest?definitionId=17?branchName=master)
+[![Build Status](https://dev.azure.com/revery-ui/revery/_apis/build/status/revery-ui.rench?branchName=master)](https://dev.azure.com/revery-ui/revery/_build/latest?definitionId=14&branchName=master)
 
 # rench
 Reason Native Cross-platform Helpers - a Node-inspired API for Reason
