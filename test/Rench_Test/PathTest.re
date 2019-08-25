@@ -62,6 +62,9 @@ describe("Path", ({describe, _}) => {
         expect.bool(Path.isAbsolute("test/test.txt")).toBe(false)
       );
     } else {
+      test("home path", ({expect}) => 
+        expect.bool(Path.isAbsolute("~/test.txt")).toBe(true)
+      );
       test("root path", ({expect}) =>
         expect.bool(Path.isAbsolute("/test.txt")).toBe(true)
       );

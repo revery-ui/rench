@@ -17,7 +17,7 @@ let extname = s => {
 };
 
 let isAbsolute = s => {
-  Fpath.v(s) |> Fpath.is_abs;
+  s |> Fpath.v |> |> Fpath.normalize |> Fpath.is_abs;
 };
 
 let join = (p1, p2) => {
