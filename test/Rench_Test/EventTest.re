@@ -3,7 +3,7 @@ open TestFramework;
 module Event = Rench.Event;
 
 describe("Event", ({test, _}) => {
-  test("dispatch", ({expect}) => {
+  test("dispatch", ({expect, _}) => {
     let evt: Event.t(int) = Event.create();
 
     let c = ref(0);
@@ -21,7 +21,7 @@ describe("Event", ({test, _}) => {
     expect.int(c^).toBe(2);
   });
 
-  test("unsubscribe", ({expect}) => {
+  test("unsubscribe", ({expect, _}) => {
     let evt: Event.t(int) = Event.create();
 
     let c = ref(0);

@@ -6,7 +6,7 @@ module Path = Rench.Path;
 
 describe("Environment", ({describe, _}) => {
   describe("which", ({test, _}) =>
-    test("can find node executable", ({expect}) => {
+    test("can find node executable", ({expect, _}) => {
       let nodePath = Environment.which("node");
       switch (nodePath) {
       | Some(v) =>
@@ -17,7 +17,7 @@ describe("Environment", ({describe, _}) => {
     })
   );
   describe("getEnvironmentVariables", ({test, _}) =>
-    test("PATH is available", ({expect}) => {
+    test("PATH is available", ({expect, _}) => {
       let env = Environment.getEnvironmentVariables();
       let expectedPath = Sys.getenv("PATH");
 
@@ -29,7 +29,7 @@ describe("Environment", ({describe, _}) => {
     })
   );
   describe("getExecutingDirectory", ({test, _}) =>
-    test("returns correct path", ({expect}) => {
+    test("returns correct path", ({expect, _}) => {
       let testRunnerPath = Environment.which("TestRunner.exe");
       switch (testRunnerPath) {
       | Some(v) =>
