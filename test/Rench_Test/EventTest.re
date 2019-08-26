@@ -9,9 +9,10 @@ describe("Event", ({test, _}) => {
     let c = ref(0);
     let f = v => {
       c := v;
+      ();
     };
 
-    let _ = Event.subscribe(evt, f);
+    let _unsubscribe = Event.subscribe(evt, f);
     Event.dispatch(evt, 1);
 
     expect.int(c^).toBe(1);
