@@ -24,7 +24,7 @@ let waitForProcessExit = (proc: ChildProcess.process) => {
 
 describe("ChildProcess", ({describe, _}) => {
   describe("spawn", ({test, _}) => {
-    test("sends output", ({expect}) => {
+    test("sends output", ({expect, _}) => {
       let script = {|
             console.log('v1000');
         |};
@@ -47,7 +47,7 @@ describe("ChildProcess", ({describe, _}) => {
       };
     });
 
-    test("kill process", ({expect}) => {
+    test("kill process", ({expect, _}) => {
       let script = {|
             while(true) { };
         |};
@@ -65,7 +65,7 @@ describe("ChildProcess", ({describe, _}) => {
       };
     });
 
-    test("kill process, after already closed", ({expect}) => {
+    test("kill process, after already closed", ({expect, _}) => {
       let script = {|
             console.log('yo');
         |};
@@ -83,7 +83,7 @@ describe("ChildProcess", ({describe, _}) => {
   });
 
   describe("stderr", ({test, _}) =>
-    test("spawn with output to stderr", ({expect}) => {
+    test("spawn with output to stderr", ({expect, _}) => {
       let script = {|
             console.error('error output');
         |};
@@ -101,7 +101,7 @@ describe("ChildProcess", ({describe, _}) => {
   );
 
   describe("spawnSync", ({test, _}) => {
-    test("process creation", ({expect}) => {
+    test("process creation", ({expect, _}) => {
       let script = {|
             console.log('v1000');
         |};
@@ -112,7 +112,7 @@ describe("ChildProcess", ({describe, _}) => {
       expect.int(proc.exitCode).toBe(0);
     });
 
-    test("i/o via readline", ({expect}) => {
+    test("i/o via readline", ({expect, _}) => {
       /* Create a simple echo script */
       let script = {|
         let readline = require('readline');
@@ -135,7 +135,7 @@ describe("ChildProcess", ({describe, _}) => {
       expect.int(proc.exitCode).toBe(0);
     });
 
-    test("i/o via pipes", ({expect}) => {
+    test("i/o via pipes", ({expect, _}) => {
       /* Create a simple echo script */
       let script = {|
         process.stdin.on("data", (d) => {
@@ -151,7 +151,7 @@ describe("ChildProcess", ({describe, _}) => {
       expect.int(proc.exitCode).toBe(0);
     });
 
-    test("default environment variable set if nothing passed", ({expect}) => {
+    test("default environment variable set if nothing passed", ({expect, _}) => {
       /* OCAML_TOPLEVEL_PATH is set by default */
       let expectedPath = Sys.getenv("OCAML_TOPLEVEL_PATH");
       let script = {|
@@ -165,7 +165,7 @@ describe("ChildProcess", ({describe, _}) => {
       expect.string(out).toEqual(expectedPath);
     });
 
-    test("picks up set environment variable", ({expect}) => {
+    test("picks up set environment variable", ({expect, _}) => {
       let script = {|
                 console.log(process.env.RENCH_TEST_VARIABLE);
           |};
@@ -181,7 +181,7 @@ describe("ChildProcess", ({describe, _}) => {
       expect.string(out).toEqual("0451");
     });
 
-    test("handles large amounts of output", ({expect}) => {
+    test("handles large amounts of output", ({expect, _}) => {
       let script = {|
             const ITERATIONS = 1000001;
             for (let i = 0; i < ITERATIONS; i++) {
@@ -203,7 +203,7 @@ describe("ChildProcess", ({describe, _}) => {
 
     exception NoNodeAvailable(string);
 
-    test("respects cwd", ({expect}) => {
+    test("respects cwd", ({expect, _}) => {
       let nodeDirectory =
         Rench.Environment.which("node")
         |> (

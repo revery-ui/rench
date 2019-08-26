@@ -4,7 +4,7 @@ module EnvironmentVariables = Rench.EnvironmentVariables;
 
 describe("EnvironmentVariables", ({describe, _}) =>
   describe("get / set", ({test, _}) =>
-    test("setting a value works", ({expect}) => {
+    test("setting a value works", ({expect, _}) => {
       let defaultEnv = [("env1", "env1value")];
 
       let env = EnvironmentVariables.create(defaultEnv);
