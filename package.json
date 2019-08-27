@@ -34,12 +34,9 @@
     "@reason-native/console": "*",
     "@reason-native/rely": "*"
   },
-  "resolutions": {
-    "@opam/re": "1.7.3"
-  },
   "devDependencies": {
-    "@opam/merlin": "3.2.2",
-    "ocaml": ">=4.6.0 <4.8.0",
-    "@opam/dune": "1.7.3"
+    "@opam/merlin": "^3.2.2",
+    "ocaml": ">=4.6.0",
+    "@opam/dune": "^1.7.3"
   }
 }

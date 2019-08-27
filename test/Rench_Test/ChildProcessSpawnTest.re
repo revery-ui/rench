@@ -31,10 +31,10 @@ describe("ChildProcess", ({describe, _}) => {
       let proc = ChildProcess.spawn("node", [|"-e", script|]);
 
       let data = ref("");
-      let _ =
-        Event.subscribe(proc.stdout.onData, str =>
+      let _event =
+        Event.subscribe(proc.stdout.onData, str => {
           data := data^ ++ Bytes.to_string(str)
-        );
+        });
 
       waitForProcessExit(proc);
 
@@ -90,7 +90,7 @@ describe("ChildProcess", ({describe, _}) => {
       let proc = ChildProcess.spawn("node", [|"-e", script|]);
 
       let data = ref("");
-      let _ =
+      let _event =
         Event.subscribe(proc.stderr.onData, str =>
           data := data^ ++ Bytes.to_string(str)
         );
