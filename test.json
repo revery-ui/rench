@@ -1,0 +1,16 @@
+{
+  "source": "./package.json",
+  "scripts": {
+      "run": "esy '@test' x TestRunner"
+  },
+  "override": {
+      "build": ["dune build --root . -j4"],
+      "install": [
+          "esy-installer Rench.install",
+          "esy-installer Rench_Test.install"
+      ],
+	  "devDependencies": {
+	    "ocaml": ">=4.6.0 <4.9.0"
+	  }
+  }
+}

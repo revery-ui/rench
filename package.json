@@ -4,14 +4,13 @@
   "description": "Reason Native Cross-platform Helpers - a Node-inspired API for Reason",
   "main": "index.js",
   "esy": {
-    "build": "refmterr dune build --root . -j4",
+    "build": "refmterr dune build -p Rench -j4",
     "install": [
-        "esy-installer Rench.install",
-        "esy-installer Rench_Test.install"
+        "esy-installer Rench.install"
     ]
   },
   "scripts": {
-    "test": "esy x TestRunner.exe",
+    "test": "esy '@test' run",
     "format": "esy dune build @fmt --auto-promote"
   },
   "repository": {
@@ -30,13 +29,12 @@
     "@opam/lwt": "*",
     "@esy-ocaml/reason": "*",
     "refmterr": "*",
-    "ocaml": "^4.6.0",
     "@reason-native/console": "*",
     "@reason-native/rely": "*"
   },
   "devDependencies": {
-    "@opam/merlin": "^3.2.2",
-    "ocaml": ">=4.6.0",
-    "@opam/dune": "^1.7.3"
+    "ocaml": ">=4.60 <4.9.0",
+    "@opam/merlin": "*",
+    "@opam/dune": "*"
   }
 }
