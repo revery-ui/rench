@@ -33,7 +33,7 @@
     "@reason-native/rely": "*"
   },
   "devDependencies": {
-    "ocaml": ">=4.60 <4.9.0",
+    "ocaml": ">=4.6.0 <4.9.0",
     "@opam/merlin": "*",
     "@opam/dune": "*"
   }
