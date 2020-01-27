@@ -7,10 +7,9 @@ type t('a) = ref(list('a => unit));
 let create = () => ref([]);
 
 let subscribe = (event, callback) => {
-  event := List.append(event^, [f]);
+  event := List.append(event^, [callback]);
 
-  let unsubscribe = () =>
-    event := List.filter(cb => cb !== callback, event^);
+  let unsubscribe = () => event := List.filter(cb => cb !== callback, event^);
   unsubscribe;
 };
 
