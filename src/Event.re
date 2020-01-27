@@ -1,17 +1,16 @@
 /* Event.re */
 
-type cb('a) = 'a => unit;
+type unsubscribe = unit => unit;
 
-type t('a) = ref(list(cb('a)));
+type t('a) = ref(list('a => unit));
 
 let create = () => ref([]);
 
-let subscribe = (evt: t('a), f: cb('a)) => {
-  evt := List.append(evt^, [f]);
-  let unsubscribe = () => {
-    evt := List.filter(f => f !== f, evt^);
-  };
+let subscribe = (event, callback) => {
+  event := List.append(event^, [callback]);
+
+  let unsubscribe = () => event := List.filter(cb => cb !== callback, event^);
   unsubscribe;
 };
 
-let dispatch = (evt: t('a), v: 'a) => List.iter(c => c(v), evt^);
+let dispatch = (event, message) => List.iter(cb => cb(message), event^);

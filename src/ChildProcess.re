@@ -217,10 +217,14 @@ let _spawn =
     _errThread: errThread,
   };
 
-  let _unsubscribe = Event.subscribe(onClose, code => { 
-      ret.exitCode := Some(code);
-      ();
-      });
+  let _unsubscribe =
+    Event.subscribe(
+      onClose,
+      code => {
+        ret.exitCode := Some(code);
+        ();
+      },
+    );
 
   ret;
 };
