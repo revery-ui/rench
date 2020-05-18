@@ -4,6 +4,7 @@
     "run": "esy '@test' x TestRunner.exe"
   },
   "override": {
+    "buildDev": "refmterr dune build --promote-install-files --root . -j4 --only-package=Rench,Rench_Test",
     "build": "dune build --promote-install-files --root . -j4 --only-package=Rench,Rench_Test",
     "install": [
       "esy-installer Rench.install",

@@ -4,6 +4,7 @@
   "description": "Reason Native Cross-platform Helpers - a Node-inspired API for Reason",
   "main": "index.js",
   "esy": {
+    "buildDev": "refmterr dune build --promote-install-files --root . --only-package Rench -j4",
     "build": "dune build -p Rench -j4"
   },
   "scripts": {
