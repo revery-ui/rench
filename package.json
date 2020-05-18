@@ -4,13 +4,10 @@
   "description": "Reason Native Cross-platform Helpers - a Node-inspired API for Reason",
   "main": "index.js",
   "esy": {
-    "build": "refmterr dune build -p Rench -j4",
-    "install": [
-        "esy-installer Rench.install"
-    ]
+    "build": "dune build -p Rench -j4"
   },
   "scripts": {
-    "test": "esy '@test' run",
+    "test": "esy @test run",
     "format": "esy dune build @fmt --auto-promote"
   },
   "repository": {
@@ -23,18 +20,16 @@
     "url": "https://github.com/bryphe/rench/issues"
   },
   "dependencies": {
-    "@opam/dune": "*",
+    "@opam/dune": ">=1.6",
     "@opam/fpath": "^0.7.2",
     "@opam/lambda-term": "*",
     "@opam/lwt": "*",
     "@esy-ocaml/reason": "*",
-    "refmterr": "*",
-    "@reason-native/console": "*",
-    "@reason-native/rely": "*"
+    "@reason-native/console": "*"
   },
   "devDependencies": {
-    "ocaml": ">=4.6.0 <4.9.0",
+    "ocaml": ">=4.6.0 <4.11.0",
     "@opam/merlin": "*",
-    "@opam/dune": "*"
+    "refmterr": "*"
   }
 }

@@ -1,16 +1,16 @@
 {
   "source": "./package.json",
   "scripts": {
-      "run": "esy '@test' x TestRunner.exe"
+    "run": "esy '@test' x TestRunner.exe"
   },
   "override": {
-      "build": ["dune build --root . -j4"],
-      "install": [
-          "esy-installer Rench.install",
-          "esy-installer Rench_Test.install"
-      ],
-	  "devDependencies": {
-	    "ocaml": ">=4.6.0 <4.9.0"
-	  }
+    "build": "dune build --promote-install-files --root . -j4 --only-package=Rench,Rench_Test",
+    "install": [
+      "esy-installer Rench.install",
+      "esy-installer Rench_Test.install"
+    ],
+    "dependencies": {
+      "@reason-native/rely": "*"
+    }
   }
 }
