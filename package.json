@@ -23,8 +23,6 @@
     "@esy-ocaml/reason": "*",
     "@opam/dune": ">=1.6",
     "@opam/fpath": "^0.7.2",
-    "@opam/lambda-term": "*",
-    "@opam/lwt": "*",
     "@reason-native/console": "*",
     "ocaml": ">=4.6.0 <4.12.0"
   },
