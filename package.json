@@ -20,15 +20,15 @@
     "url": "https://github.com/bryphe/rench/issues"
   },
   "dependencies": {
+    "@esy-ocaml/reason": "*",
     "@opam/dune": ">=1.6",
     "@opam/fpath": "^0.7.2",
     "@opam/lambda-term": "*",
     "@opam/lwt": "*",
-    "@esy-ocaml/reason": "*",
-    "@reason-native/console": "*"
+    "@reason-native/console": "*",
+    "ocaml": ">=4.6.0 <4.12.0"
   },
   "devDependencies": {
-    "ocaml": ">=4.6.0 <4.11.0",
     "@opam/merlin": "*",
     "refmterr": "*"
   }
