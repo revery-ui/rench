@@ -10,7 +10,7 @@
           "esy-installer Rench_Test.install"
       ],
 	  "devDependencies": {
-	    "ocaml": ">=4.6.0 <4.9.0"
+	    "ocaml": "~4.11"
 	  }
   }
 }

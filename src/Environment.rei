@@ -5,8 +5,6 @@
  * Similiar to the 'os'/process modules in Node
  */
 
-let which: string => option(string);
-
 let newLine: string;
 
 let getEnvironmentVariables: unit => EnvironmentVariables.t;

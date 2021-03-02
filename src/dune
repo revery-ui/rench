@@ -3,4 +3,4 @@
     (public_name Rench)
     (flags (:standard -w -21))
     (c_names process)
-    (libraries fpath lwt lwt.unix console.lib))
+    (libraries fpath))

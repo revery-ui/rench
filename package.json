@@ -25,14 +25,10 @@
   "dependencies": {
     "@opam/dune": "*",
     "@opam/fpath": "^0.7.2",
-    "@opam/lambda-term": "*",
-    "@opam/lwt": "*",
-    "@opam/reason": "*",
-    "@reason-native/console": "*",
-    "@reason-native/rely": "*"
+    "@opam/reason": "^3.6.0"
   },
   "devDependencies": {
-    "ocaml": ">=4.6.0 <4.9.0",
+    "ocaml": "~4.11",
     "@opam/merlin": "*",
     "@opam/dune": "*"
   }
